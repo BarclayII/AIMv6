@@ -1,0 +1,37 @@
+The source organization is inspired by the ones in Linux and OpenBSD.
+More suggestions are welcome.
+
+The sources are separated into: bootloader, drivers, kernel, C library, and
+userspace programs.
+
+./:
+No separate files other than Makefile or autotools-related stuff (if any)
+should really be placed here, I guess?
+
+boot:
+Place bootloader-related source codes and headers there.
+
+doc:
+Place documentations there, if any.
+
+drivers:
+Place driver-specific sources and headers there.
+Both bootloader and kernel may need to play with drivers.
+
+kern:
+Place all kernel-specific source codes and headers (including but not limited
+to: memory allocator, exception handler, scheduler) there.
+
+include:
+Place all generic C Library headers (e.g. stdio.h, stdlib.h, assert.h) there.
+Component-specific headers should be placed inside directories such as
+kern/include etc.
+
+lib:
+Place all generic C Library sources (e.g. sprintf(3), strlcpy(3), memset(3)),
+and C Runtime sources (crt0.S and other sources for statically linking user
+programs) there.
+
+usr:
+Place all sources for userspace programs (e.g. init(1), sh(1)) there.
+

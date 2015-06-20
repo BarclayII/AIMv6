@@ -1,0 +1,17 @@
+More suggestions are welcome.
+
+lib:
+Generic libraries and C runtime sources should be here.
+
+lib/libc:
+C Library and C runtime routines should go there.
+
+lib/libc/arch:
+Architecture-dependent stuff of C Runtime.  Mainly crt0.S and system call
+wrappers.
+
+lib/libc/stdio:
+lib/libc/stdlib:
+lib/libc/string:
+...
+C standard functions (sprintf(3), memset(3) etc.) should go there.

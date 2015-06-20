@@ -1,0 +1,28 @@
+More suggestions are welcome.
+I didn't think thoroughly of how to separate between early immediate accesses
+(like loading file from disk during booting) and late device configurations
+(like initializing devfs).  Besides, xv6 on i386 seems to interact with UART
+via inb() and outb(), so I'm not sure whether we should wrap memory-mapped
+hardware register accesses into functions to maintain compatibility.
+The following is only a possible organization.
+
+drivers:
+For driver-specific stuff.
+
+The following drivers probably should be prioritized:
+  1.  UART driver
+  2.  AHCI driver (for controlling SATA)
+  3.  SD driver (?) (for Zedboard)
+
+drivers/ahci:
+AHCI driver source codes.
+
+drivers/include:
+Headers for drivers.
+
+drivers/sd:
+Driver source codes for SD cards (?)
+
+drivers/serial:
+Driver source codes for serial console, e.g. UART.
+

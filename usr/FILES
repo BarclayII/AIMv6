@@ -1,0 +1,9 @@
+More suggestions are welcome.
+
+usr:
+Userspace programs should be here.
+Each program should take one sub-directory.
+
+usr/init:
+init(1) is preferred to be run in userspace.
+

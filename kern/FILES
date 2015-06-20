@@ -1,0 +1,62 @@
+More suggestions are welcome.
+
+kern:
+All kernel-related sources and headers should be here.
+
+kern/arch/$(ARCH):
+Architecture dependent sources, including trap handling, context switches, etc.
+should go there.
+
+kern/arch/$(ARCH)/$(MACH):
+For machine dependent sources.
+
+kern/arch/$(ARCH)/include/asm:
+For architecture-dependent headers.
+
+kern/arch/$(ARCH)/include/asm/mach-$(MACH):
+For machine-dependent headers.
+
+kern/include:
+Kernel-specific headers should go there.  Module-specific sub-directories are
+recommended.
+Architecture-dependent headers should go inside kern/arch/$(ARCH)/include/asm
+rather than kern/include.
+
+kern/arch/$(ARCH)/mm, kern/mm:
+Memory management, including memory allocators, both physical and virtual.
+
+The physical memory allocator should expose the following structure:
+
+	struct page
+		For physical page representation
+
+and the following interfaces:
+
+	alloc_pages(int num)
+		Allocate @num pages.
+	free_pages(struct page *p, int num)
+		Free @num pages starting from @p.
+
+The virtual memory allocator should expose the following interfaces:
+
+	kmalloc(size_t size)
+		Allocate @size bytes.
+	kfree(void *ptr)
+		Free an allocation including @ptr.
+
+and can optionally include kernel equivalents of calloc(3) and realloc(3).
+
+See kern/mm/DESIGN for my (BarclayII's) current design of memory allocators.
+
+The memory management module should expose the following structure:
+
+	struct mm_struct
+		A per-process structure containing memory mapping etc.
+
+kern/arch/$(ARCH)/sched, kern/sched:
+Scheduler-related sources, including process (and thread, if any) management,
+should go there.
+
+kern/sync:
+Synchronization-related sources (spinlocks, semaphores etc.) should go there.
+
