@@ -57,6 +57,32 @@ kern/arch/$(ARCH)/sched, kern/sched:
 Scheduler-related sources, including process (and thread, if any) management,
 should go there.
 
+The scheduler should declare the following structures:
+
+	struct task_struct
+		For denoting a process (or thread, if any).
+
+and either of the following structures:
+
+	struct cpu_run_queue
+		For denoting a run queue on a single CPU.
+	struct run_queue
+		For denoting a run queue shared over all CPUs.
+
+and the following interfaces:
+
+	cpurq_enqueue(struct cpu_run_queue *rq, struct task_struct *t)
+		Insert task @t into run queue @rq.
+	cpurq_dequeue(struct task_struct *t)
+		Remove task @t from the queue it resides in.
+	cpurq_pick_next(struct cpu_run_queue *rq)
+		Return the next task to be run in @rq.  Does *not* pop the
+		task.
+	cpurq_tick(struct task_struct *t)
+		Indicates a tick of execution of @t.
+
+or the run_queue variants.
+
 kern/sync:
 Synchronization-related sources (spinlocks, semaphores etc.) should go there.
 
