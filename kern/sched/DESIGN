@@ -1,0 +1,5 @@
+[BarclayII]
+I used a list rather than a PID-indexed array to hold the processes.
+
+The scheduler I chose is the old O(1) scheduler, which is relatively easy to
+implement?

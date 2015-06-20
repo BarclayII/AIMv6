@@ -16,6 +16,9 @@ For architecture-dependent headers.
 kern/arch/$(ARCH)/include/asm/mach-$(MACH):
 For machine-dependent headers.
 
+kern/fs:
+Source codes about filesystems should go there.
+
 kern/include:
 Kernel-specific headers should go there.  Module-specific sub-directories are
 recommended.

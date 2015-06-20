@@ -1,0 +1,9 @@
+[BarclayII]
+I enabled incontiguous physical page allocation to solve fragmentation
+problems.  An alloc_pages() call may return a list of pages which may
+be incontiguous (for example, returning a list with PFN 1, 3, 5, 6, 7).
+Not sure whether it's a good design...
+
+For virtual memory allocators I implemented a simple SLAB allocator
+(currently in xv6-Loongson3a).
+
