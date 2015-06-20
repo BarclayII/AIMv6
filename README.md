@@ -9,3 +9,6 @@ Our first goal is to port xv6 onto ARM and MIPS64 (Loongson 2H).
 The guides for placing and organizing source codes are in FILES in each directory.
 
 Remember to add license information on top of the source code :)
+
+This repository supersedes xv6-Loongson3A, the code from which will be migrated
+there.
