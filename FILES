@@ -32,6 +32,6 @@ Place all generic C Library sources (e.g. sprintf(3), strlcpy(3), memset(3)),
 and C Runtime sources (crt0.S and other sources for statically linking user
 programs) there.
 
-usr:
+user:
 Place all sources for userspace programs (e.g. init(1), sh(1)) there.
 
