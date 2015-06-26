@@ -19,6 +19,3 @@ cross-compiling) toolchain available on either Linux distro.
 
 (TODO: specify the version and download link if the latest version could not
 do for any reason)
-
-We do *not* employ autotools here.  All Makefiles are handwritten.
-
