@@ -10,6 +10,15 @@ lib/libc/arch:
 Architecture-dependent stuff of C Runtime.  Mainly crt0.S and system call
 wrappers.
 
+ARM-specific notes:
+As of GCC 5.1 the C compiler will emit a call to __aeabi_idivmod or something
+alike to do division on software since ARM does not include hardware division.
+The corresponding functions should be inside lib/libc/arch/arm.
+
+One can see how GCC mess with division or modulo by printing out the assembly:
+
+gcc -S -o test.o test.c
+
 lib/libc/stdio:
 lib/libc/stdlib:
 lib/libc/string:
