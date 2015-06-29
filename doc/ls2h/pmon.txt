@@ -1,0 +1,52 @@
+# A Brief Documentation of PMON, the PROM Monitor
+
+PROM (Programmable Read-Only Memory) Monitor is an open source boot environment
+solution for MIPS machines.  It is simpler than traditional BIOS on IBM-
+compatible PC, but it also does the job of a bootloader (like GRUB).
+
+### Links
+
+PMON Source: (TODO)
+PMON Binary: (TODO)
+PMON Compiling Instructions: (TODO)
+PMON Documentation: (TODO)
+
+### Command-Line Interface
+
+PMON would hint for a key press with the following message:
+
+	Press any other key to abort.
+
+Hitting a key other than ENTER would bring up the command line interface.
+
+Enter `h` for help, `h <command>` for description of given command.
+
+A preferred method of testing one's bootloader and kernel is booting via TFTP,
+which is covered in next section.
+
+Although our ultimate goal is to burn the BIOS and to produce a standalone
+self-bootable machine, it is *NOT* recommended to test one's bootloader by
+directly burning the ROM because PMON has a lot of excellent builtin abilities
+such as:
+  1. TLB, cache, and serial console initialization.
+  2. Exception handling.
+  3. Preliminary debugging.
+  4. Network interface (hard to implement from scratch).
+
+A preferred method for experimenting one's own bootloader is to remotely load
+the bootloader image into RAM via TFTP, which is covered in the following
+sections.
+
+### Network configuration
+
+(TODO: add tutorial for configuring network by `ifaddr`, `ping` and other
+commands)
+
+### Booting via TFTP
+
+(TODO: add TFTP setup, `load` command and steps for loading bootloader or
+kernel image into RAM)
+
+### Burning BIOS
+
+(TODO: add `load` command and steps for burning into ROM)
