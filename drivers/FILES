@@ -14,8 +14,8 @@ The following drivers probably should be prioritized:
   2.  AHCI driver (for controlling SATA)
   3.  SD driver (?) (for Zedboard)
 
-drivers/ahci:
-AHCI driver source codes.
+drivers/ata:
+ATA (including SATA) driver source codes.
 
 drivers/include:
 Headers for drivers.
