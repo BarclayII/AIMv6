@@ -10,7 +10,25 @@ The only thing we care is bootloader since most work is done by SeaBIOS.
 
 ### arm/Zedboard
 
-TODO: add summary
+Booting on zedboard includes multiple stages.
+
+* Stage 0, on-chip bootROM, poorly documented, possibly executed in-place.
+Programmers have NO access to this ROM. It writes basic configuration to the
+processing system (PS) but not programmable logic (PL), making basic peripherals
+accessible, loads boot image from media (according to jumper values), and handoff
+to first-stage bootloader (FSBL) inside the image.
+* Stage 1, FSBL, loaded into OCM. Should program PS and PL (even if it is blank),
+load next stage and handoff.
+* Stage 2, SSBL or second-stage bootloader, loaded into DDR. Should find kernel,
+load it and boot it.
+
+Our design is to build a basic FSBL, which reads MBR on SD card, verify its magic,
+and handoff. This FSBL should eventually end up in QSPI flash to save a boot flag
+(Because bootROM's exact behavior is undocumented), but currently a file in the
+FAT32 partition is just okay.
+
+Our SSBL should start from MBR, and from this point on everything should be unified
+across platforms and devices.
 
 ### mips32/Loongson-2H3A
 
