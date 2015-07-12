@@ -20,6 +20,9 @@
  * SATA 1.1 specification, available on Intel website
  *
  * SATA Storage Technology, Don Anderson, Mindshare, 2007
+ *
+ * ATAPI 7 Specifications, available at
+ * https://ata.wiki.kernel.org/index.php/Developer_Resources
  */
 
 #ifndef _DRIVERS_ATA_AHCI_FIS_H

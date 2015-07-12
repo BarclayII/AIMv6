@@ -26,6 +26,7 @@ include:
 Place all generic C Library headers (e.g. stdio.h, stdlib.h, assert.h) there.
 Component-specific headers should be placed inside directories such as
 kern/include etc.
+General architecture-specific headers are placed inside include/arch/$ARCH/asm.
 
 lib:
 Place all generic C Library sources (e.g. sprintf(3), strlcpy(3), memset(3)),
