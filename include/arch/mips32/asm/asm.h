@@ -95,12 +95,14 @@ symbol:		.frame	sp, framesize, rpc
  */
 #define DEFINE_STRING(sym, str)				\
 		.type	sym, @object;			\
+		.align	2;				\
 sym:		.ascii	str;				\
 		.size	sym,.-sym;
 
 #define DEFINE_GLOBAL_STRING(sym, str)			\
 		.globl	sym;				\
 		.type	sym, @common;			\
+		.align	2;				\
 sym:		.ascii	str;				\
 		.size	sym,.-sym;
 
@@ -108,18 +110,22 @@ sym:		.ascii	str;				\
 
 #define DEFINE_WORD(sym, word)				\
 		.type	sym, @object;			\
+		.align	2;				\
 sym:		.word	word;
 
 #define DEFINE_GLOBAL_WORD(sym, word)			\
 		.globl	sym;				\
 		.type	sym, @common;			\
+		.align	2;				\
 sym:		.word	word
 
 #define DEFINE_LONG(sym, long)				\
 		.type	sym, @object;			\
+		.align	2;				\
 sym:		.long	long;
 
 #define DEFINE_GLOBAL_LONG(sym, long)			\
 		.globl	sym;				\
+		.align	2;				\
 		.type	sym, @common;			\
 sym:		.long	long

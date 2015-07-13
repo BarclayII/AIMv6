@@ -41,10 +41,24 @@ END(_reset)
 .org	0x300
 
 NESTED(_start, 0, sp)
+	/*
+	 * Some registers are reserved for serial consoles until we jumped
+	 * to bootmain().
+	 * See boot/arch/mips32/loongson2h/early_serial.S for extra notes
+	 * when writing assembly.
+	 */
 	bal	initserial
 	ls	a0, __test_serial
 	bal	stringserial
-1:
+	li	a0, 0x12345678
+	bal	hexserial32
+	ls	a0, __crlf
+	bal	stringserial
+	li	a0, 12345678
+	bal	udecserial
+	ls	a0, __crlf
+	bal	stringserial
+1:	nop
 	j	1b
 END(_start)
 
@@ -55,4 +69,4 @@ LEAF(locate)
 END(locate)
 
 DEFINE_STRING(__test_serial, "\r\nSerial Initialization Success\r\n\0")
-
+DEFINE_STRING(__crlf, "\r\n\0")
