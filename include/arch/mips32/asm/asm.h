@@ -15,30 +15,30 @@
 /*
  * LEAF - declare leaf routine
  */
-#define LEAF(symbol)                                    \
-                .globl  symbol;                         \
-                .align  2;                              \
-                .type   symbol,@function;               \
-                .ent    symbol,0;                       \
-symbol:         .frame  sp,0,ra
+#define LEAF(symbol)					\
+		.globl	symbol;				\
+		.align	2;				\
+		.type	symbol, @function;		\
+		.ent	symbol,0;			\
+symbol:		.frame	sp,0,ra
 
 /*
  * NESTED - declare nested routine entry point
  */
-#define NESTED(symbol, framesize, rpc)                  \
-                .globl  symbol;                         \
-                .align  2;                              \
-                .type   symbol,@function;               \
-                .ent    symbol,0;                       \
-symbol:         .frame  sp, framesize, rpc
+#define NESTED(symbol, framesize, rpc)			\
+		.globl	symbol;				\
+		.align	2;				\
+		.type	symbol, @function;		\
+		.ent	symbol,0;			\
+symbol:		.frame	sp, framesize, rpc
 
 
 /*
  * END - mark end of function
  */
-#define END(function)                                   \
-                .end    function;                       \
-                .size   function,.-function
+#define END(function)					\
+		.end	function;			\
+		.size	function,.-function
 
 /*
  * GCC supported pseudo-instructions which are commonly used for convenience:
@@ -89,4 +89,37 @@ symbol:         .frame  sp, framesize, rpc
 		la	\reg, \sym($0)
 		.endm
 
+/*
+ * DEFINE_<TYPE> - Define a local <type> for current assembly source only
+ * DEFINE_GLOBAL_<TYPE> - Define a global <type> shared across assembly files
+ */
+#define DEFINE_STRING(sym, str)				\
+		.type	sym, @object;			\
+sym:		.ascii	str;				\
+		.size	sym,.-sym;
+
+#define DEFINE_GLOBAL_STRING(sym, str)			\
+		.globl	sym;				\
+		.type	sym, @common;			\
+sym:		.ascii	str;				\
+		.size	sym,.-sym;
+
 #endif
+
+#define DEFINE_WORD(sym, word)				\
+		.type	sym, @object;			\
+sym:		.word	word;
+
+#define DEFINE_GLOBAL_WORD(sym, word)			\
+		.globl	sym;				\
+		.type	sym, @common;			\
+sym:		.word	word
+
+#define DEFINE_LONG(sym, long)				\
+		.type	sym, @object;			\
+sym:		.long	long;
+
+#define DEFINE_GLOBAL_LONG(sym, long)			\
+		.globl	sym;				\
+		.type	sym, @common;			\
+sym:		.long	long

@@ -1,0 +1,58 @@
+# Copyright (C) 2015 Gan Quan <coin2028@hotmail.com>
+#
+# This program is free software; you can redistribute  it and/or modify it
+# under  the terms of  the GNU General  Public License as published by the
+# Free Software Foundation;  either version 2 of the  License, or (at your
+# option) any later version.
+
+# Makefile for MIPS32
+
+######## BEGIN CONFIG ########
+CROSS_COMPILE	=  mips64-linux-gnu-
+
+MACH		=  loongson2h
+
+INSTALLDIR	=  /srv/tftp
+
+# Only needed if the installation needs sudo privileges
+SUDO		=
+########  END  CONFIG ########
+
+ROOTDIR		=  $(shell pwd)
+
+CC		=  $(CROSS_COMPILE)gcc
+CPP		=  $(CROSS_COMPILE)cpp
+LD		=  $(CROSS_COMPILE)ld
+OBJDUMP		=  $(CROSS_COMPILE)objdump
+
+INCFLAG		=  -I. -I./include -I./include/arch/$(ARCH)
+
+CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=32 -fno-builtin
+CFLAGS		+= -nostdinc -nostdlib -g -mips32r2 -EL $(INCFLAG)
+
+LDSCRIPT	=  boot/arch/$(ARCH)/$(MACH)/ldscript.ld
+LDFLAGS		=  -EL -N -T$(LDSCRIPT)
+
+OBJS		=  boot/arch/$(ARCH)/$(MACH)/entry.o \
+		   boot/arch/$(ARCH)/$(MACH)/early_serial.o
+
+BINARY		=  bootstrap
+DISASSEMBLY	=  $(BINARY).s
+
+all: elf
+
+elf: $(OBJS)
+	$(LD) $(LDFLAGS) -o $(BINARY) $(OBJS)
+	$(OBJDUMP) -S $(BINARY) >$(DISASSEMBLY)
+
+install: all
+	$(SUDO) cp $(BINARY) $(INSTALLDIR)
+
+clean:
+	rm -rf $(OBJS) $(BINARY)
+
+uninstall:
+	cd $(INSTALLDIR) && rm -rf $(BINARY)
+
+.S.o:
+	$(CC) $(CFLAGS) -c $< -o $*.o
