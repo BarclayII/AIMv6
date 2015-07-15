@@ -34,7 +34,9 @@ LDSCRIPT	=  boot/arch/$(ARCH)/$(MACH)/ldscript.ld
 LDFLAGS		=  -EL -N -T$(LDSCRIPT)
 
 OBJS		=  boot/arch/$(ARCH)/$(MACH)/entry.o \
-		   boot/arch/$(ARCH)/$(MACH)/early_serial.o
+		   boot/arch/$(ARCH)/$(MACH)/early_serial.o \
+		   boot/arch/$(ARCH)/$(MACH)/dummy.o \
+		   boot/arch/$(ARCH)/$(MACH)/bootmain.o
 
 BINARY		=  bootstrap
 DISASSEMBLY	=  $(BINARY).s

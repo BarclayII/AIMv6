@@ -21,7 +21,7 @@
  *
  * SATA Storage Technology, Don Anderson, Mindshare, 2007
  *
- * ATAPI 7 Specifications, available at
+ * ATAPI 7 Specifications, Volume 3, available at
  * https://ata.wiki.kernel.org/index.php/Developer_Resources
  */
 
@@ -100,8 +100,8 @@ struct fis_reg_h2d {
 		struct fis_lba lba;	/* Logical Block Address */
 	};
 	/* DWORD 3 */
-	uchar		count_l;	/* Sector count [7..0] */
-	uchar		count_h;	/* Sector count [15..8] */
+	uchar		nsec_l;		/* Sector count [7..0] */
+	uchar		nsec_h;		/* Sector count [15..8] */
 	uchar		pad1;
 	uchar		ctrl;		/* Control register */
 #define FIS_CTRL_HOB	0x80		/* High Order Byte */
@@ -135,8 +135,8 @@ struct fis_reg_d2h {
 		struct fis_lba lba;	/* Logical Block Address */
 	};
 	/* DWORD 3 */
-	uchar		count_l;	/* Sector count [7..0] */
-	uchar		count_h;	/* Sector count [15..8] */
+	uchar		nsec_l;		/* Sector count [7..0] */
+	uchar		nsec_h;		/* Sector count [15..8] */
 	ushort		pad1;
 	/* DWORD 4 */
 	uint		pad2;
@@ -153,13 +153,37 @@ struct fis_set_dev_bits {
 	uchar		pad1:1;
 	uchar		intr:1;		/* Interrupt bit */
 	uchar		pad2:1;
-	uchar		stat;		/* Status register w/o BUSY and DRQ */
+	uchar		status;		/* Status register w/o BUSY and DRQ */
 	uchar		error;		/* Error register */
 	/* DWORD 1 */
 	union {
 		uint	pad3;
 		uint	sactive;	/* SActive bitmap for NCQ */
 	}
+};
+
+struct fis_pio_setup {
+	/* DWORD 0 */
+	uchar		type;		/* FIS_PIO_SETUP */
+	uchar		pad0:5;
+	uchar		writemem:1;	/* Host memory being written by dev */
+	uchar		intr:1;		/* Interrupt bit */
+	uchar		pad1:1;
+	uchar		begin_status;	/* Begin status */
+	uchar		error;
+	/* DWORD 1-2 */
+	union {
+		struct fis_chs chs;
+		struct fis_lba lba;
+	};
+	/* DWORD 3 */
+	uchar		nsec_l;
+	uchar		nsec_h;
+	uchar		pad2;
+	uchar		end_status;	/* End status */
+	/* DWORD 4 */
+	ushort		nbytes;		/* a.k.a. Transfer Count */
+	ushort		pad3;
 };
 
 struct fis_dma_setup {

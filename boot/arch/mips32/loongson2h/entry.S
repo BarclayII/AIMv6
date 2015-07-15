@@ -14,6 +14,8 @@
 #include <asm/cp0regdef.h>
 #include <drivers/serial/uart16550.h>
 
+#define STACKSIZE	0x80000
+
 NESTED(_reset, 0, sp)
 	/*
 	 * Startup routine:
@@ -29,6 +31,13 @@ NESTED(_reset, 0, sp)
 	 * 8. Copy MBR to RAM
 	 * 9. Execute MBR
 	 */
+
+	/*
+	 * Reserved static registers:
+	 * s0 - Entry address
+	 * s1 - RAM program end address
+	 */
+
 	/* Locate the entrance */
 	bal	locate
 	move	v0, s0
@@ -50,14 +59,16 @@ NESTED(_start, 0, sp)
 	bal	initserial
 	ls	a0, __test_serial
 	bal	stringserial
-	li	a0, 0x12345678
-	bal	hexserial32
-	ls	a0, __crlf
-	bal	stringserial
-	li	a0, 12345678
-	bal	udecserial
-	ls	a0, __crlf
-	bal	stringserial
+
+	/*
+	 * Assume that Step 2 to Step 5 are done *magically*.
+	 */
+	bal	initddr
+	bal	initcache
+	bal	inittlb
+	bal	copy_to_ram
+	bal	initstack
+	j	bootmain
 1:	nop
 	j	1b
 END(_start)
@@ -67,6 +78,30 @@ LEAF(locate)
 	addiu	v0, -8
 	jr	ra
 END(locate)
+
+LEAF(copy_to_ram)
+	/* If the code is already at RAM, do nothing */
+	li	t0, 0xbfc00000
+	blt	s0, t0, 1f
+	/* Copy the entire ROM to RAM */
+	ls	t1, __end__
+	li	s1, 0x88c00000
+2:	lw	a0, (s0)
+	sw	a0, (s1)
+	addiu	s0, 4
+	addiu	s1, 4
+	blt	s0, t1, 2b
+	/* Jump to RAM */
+	subu	t1, s1
+	subu	ra, t1
+1:	jr	ra
+END(copy_to_ram)
+
+LEAF(initstack)
+	li	v0, STACKSIZE
+	addu	sp, s1, v0
+	jr	ra
+END(initstack)
 
 DEFINE_STRING(__test_serial, "\r\nSerial Initialization Success\r\n\0")
 DEFINE_STRING(__crlf, "\r\n\0")
