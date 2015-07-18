@@ -16,9 +16,7 @@
 
 #ifdef UART16550
 #include <drivers/serial/uart16550.h>
-#endif
-
-#ifdef UART_XILINX
+#elif defined UART_ZYNQ7000
 #include <drivers/serial/uart-xilinx.h>
 #endif
 
