@@ -16,13 +16,37 @@
  * IO should always operate on unsigned data.
  */
 
-unsigned char in8(unsigned long addr);
-unsigned short in16(unsigned long addr);
-unsigned long in32(unsigned int addr);
+static inline unsigned char in8(unsigned long addr)
+{
+    return *(volatile unsigned char *)addr;
+}
 
-void out8(unsigned long addr, unsigned char data);
-void out16(unsigned long addr, unsigned short data);
-void out32(unsigned long addr, unsigned long data);
+static inline unsigned short in16(unsigned long addr)
+{
+    return *(volatile unsigned short *)addr;
+}
+
+static inline unsigned long in32(unsigned long addr)
+{
+    return *(volatile unsigned long *)addr;
+}
+
+
+static inline void out8(unsigned long addr, unsigned char data)
+{
+    *(volatile unsigned char *)addr = data;
+}
+
+static inline void out16(unsigned long addr, unsigned short data)
+{
+    *(volatile unsigned short *)addr = data;
+}
+
+static inline void out32(unsigned long addr, unsigned long data)
+{
+    *(volatile unsigned long *)addr = data;
+}
+
 
 #endif
 
