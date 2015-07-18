@@ -39,6 +39,7 @@ OBJS		=  boot/arch/$(ARCH)/$(MACH)/entry.o \
 		   boot/arch/$(ARCH)/$(MACH)/early_serial.o \
 		   boot/arch/$(ARCH)/$(MACH)/dummy.o \
 		   boot/arch/$(ARCH)/$(MACH)/bootmain.o \
+		   boot/arch/$(ARCH)/$(MACH)/sata.o \
 		   drivers/serial/uart16550.o \
 		   lib/libc/stdio/snprintf.o
 

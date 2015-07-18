@@ -81,7 +81,7 @@ struct fis_lba {
 	union {
 		uchar	feat_e;		/* Features register [15..8] */
 		uchar	rsvd;		/* Not used */
-	}
+	};
 };
 
 /* Host to Device - usually for writing */
@@ -159,7 +159,7 @@ struct fis_set_dev_bits {
 	union {
 		uint	pad3;
 		uint	sactive;	/* SActive bitmap for NCQ */
-	}
+	};
 };
 
 struct fis_pio_setup {

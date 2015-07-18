@@ -49,6 +49,7 @@ int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
 	int base;
 	int flag = 0;
 	ssize_t pos = 0;
+	int len;
 
 	int buf_pos;
 	char buf[25];
@@ -116,8 +117,10 @@ print_uint:			buf_pos = 0;
 				break;
 			case 's':
 				s = va_arg(ap, char *);
-				for (; *s != '\0'; ++s)
+				for (len = 0; *s != '\0'; ++s, ++len)
 					set_ch(*s);
+				for (; len < width; ++len)
+					set_ch(' ');
 				++fmt;
 				break;
 			case '%':

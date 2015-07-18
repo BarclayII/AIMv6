@@ -18,22 +18,24 @@
 #include <sys/types.h>
 #include <asm/addrspace.h>
 
+#define iomap(addr)		(IO_BASE + (addr))
+
 /*
  * inx() and outx() for MIPS receives physical address as parameter
  */
 #define inb(addr)		\
-	(*(volatile uchar *)(IO_BASE + (addr)))
+	(*(volatile uchar *)iomap(addr))
 #define outb(addr, data)	\
-	((*(volatile uchar *)(IO_BASE + (addr))) = (data))
+	((*(volatile uchar *)iomap(addr)) = (data))
 
 #define inw(addr)		\
-	(*(volatile ushort *)(IO_BASE + (addr)))
+	(*(volatile ushort *)iomap(addr))
 #define outw(addr, data)	\
-	((*(volatile ushort *)(IO_BASE + (addr))) = (data))
+	((*(volatile ushort *)iomap(addr)) = (data))
 
 #define ind(addr)		\
-	(*(volatile uint *)(IO_BASE + (addr)))
+	(*(volatile uint *)iomap(addr))
 #define outd(addr, data)	\
-	((*(volatile uint *)(IO_BASE + (addr))) = (data))
+	((*(volatile uint *)iomap(addr)) = (data))
 
 #endif
