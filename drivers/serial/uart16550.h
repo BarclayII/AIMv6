@@ -151,10 +151,11 @@
 #define UART_READ(reg)		inb(UART_BASE + (reg))
 #define UART_WRITE(reg, data)	outb(UART_BASE + (reg), data)
 
-unsigned char uart16550_spin_getbyte(void);
-void uart16550_spin_putbyte(unsigned char byte);
-void uart_spin_puts(const char *str);
-ssize_t uart_spin_printf(const char *fmt, ...);
+void uart_init(void);
+void uart_enable(void);
+void uart_disable(void);
+unsigned char uart_spin_getbyte(void);
+void uart_spin_putbyte(unsigned char byte);
 
 #endif
 

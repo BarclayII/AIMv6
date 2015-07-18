@@ -2,7 +2,7 @@
 #include <asm/prim.h>
 #include <drivers/ata/ahci_hba.h>
 #include <drivers/ata/ahci_fis.h>
-#include <drivers/serial/uart16550.h>
+#include <drivers/serial/uart.h>
 
 volatile struct ahci_hba *hba = (struct ahci_hba *)iomap(SATA_BASE);
 

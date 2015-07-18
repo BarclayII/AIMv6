@@ -32,15 +32,16 @@ CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=32 -fno-builtin
 CFLAGS		+= -nostdinc -nostdlib -g -mips32r2 -EL $(INCFLAG)
 CFLAGS		+= -DMACH_$(UPPERMACH)
 
-LDSCRIPT	=  boot/arch/$(ARCH)/$(MACH)/ldscript.ld
+LDSCRIPT	=  bios/arch/$(ARCH)/$(MACH)/ldscript.ld
 LDFLAGS		=  -EL -N -T$(LDSCRIPT)
 
-OBJS		=  boot/arch/$(ARCH)/$(MACH)/entry.o \
-		   boot/arch/$(ARCH)/$(MACH)/early_serial.o \
-		   boot/arch/$(ARCH)/$(MACH)/dummy.o \
-		   boot/arch/$(ARCH)/$(MACH)/bootmain.o \
-		   boot/arch/$(ARCH)/$(MACH)/sata.o \
+OBJS		=  bios/arch/$(ARCH)/$(MACH)/entry.o \
+		   bios/arch/$(ARCH)/$(MACH)/early_serial.o \
+		   bios/arch/$(ARCH)/$(MACH)/dummy.o \
+		   bios/arch/$(ARCH)/$(MACH)/bootmain.o \
+		   bios/arch/$(ARCH)/$(MACH)/sata.o \
 		   drivers/serial/uart16550.o \
+		   drivers/serial/uart.o \
 		   lib/libc/stdio/snprintf.o
 
 BINARY		=  bootstrap

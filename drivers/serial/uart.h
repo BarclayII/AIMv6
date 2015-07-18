@@ -8,17 +8,21 @@
  *
  */
 
+#ifndef _DRIVERS_SERIAL_UART_H
+#define _DRIVERS_SERIAL_UART_H
+
+#include <config.h>
+#include <sys/types.h>
+
+#ifdef UART16550
 #include <drivers/serial/uart16550.h>
+#endif
 
-extern void sata_print_cap(void);
+#ifdef UART_XILINX
+#include <drivers/serial/uart-xilinx.h>
+#endif
 
-void bootmain(void)
-{
-	uart_spin_puts("Entered bootmain()\r\n");
-	uart_spin_printf("Jumping to C code at %08x\r\n", bootmain);
+void uart_spin_puts(const char *str);
+ssize_t uart_spin_printf(const char *fmt, ...);
 
-	sata_print_cap();
-
-	for (;;)
-		/* nothing */;
-}
+#endif

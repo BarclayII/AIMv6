@@ -17,6 +17,8 @@
  * The hardware register addresses are preset by the manufacturer.
  */
 
+#define UART16550
+
 #define UART0_BASE	0x1fe80000
 #define UART1_BASE	0x1fe81000
 #define UART2_BASE	0x1fe82000

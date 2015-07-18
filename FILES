@@ -8,6 +8,9 @@ userspace programs.
 No separate files other than Makefile or autotools-related stuff (if any)
 should really be placed here, I guess?
 
+bios:
+Place everything prior to bootloader (e.g. BIOS, bootROM, etc.) there.
+
 boot:
 Place bootloader-related source codes and headers there.
 
