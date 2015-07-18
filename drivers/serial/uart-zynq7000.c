@@ -9,6 +9,7 @@
  */
 
 #include <config.h>
+#include <io.h>
 
 #ifdef UART_ZYNQ7000
 
@@ -20,6 +21,8 @@ void uart_init(void)
 
 void uart_enable(void)
 {
+	/* Enable TX and RX */
+	out8()
 }
 
 void uart_disable(void)
