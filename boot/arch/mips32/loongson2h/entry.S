@@ -40,7 +40,7 @@ NESTED(_reset, 0, sp)
 
 	/* Locate the entrance */
 	bal	locate
-	move	v0, s0
+	move	s0, v0
 	/* Start initialization */
 	bal	_start
 1:
@@ -68,6 +68,8 @@ NESTED(_start, 0, sp)
 	bal	inittlb
 	bal	copy_to_ram
 	bal	initstack
+	ls	a0, __bootmain_msg
+	bal	stringserial
 	j	bootmain
 1:	nop
 	j	1b
@@ -82,9 +84,9 @@ END(locate)
 LEAF(copy_to_ram)
 	/* If the code is already at RAM, do nothing */
 	li	t0, 0xbfc00000
+	ls	t1, __end__
 	blt	s0, t0, 1f
 	/* Copy the entire ROM to RAM */
-	ls	t1, __end__
 	li	s1, 0x88c00000
 2:	lw	a0, (s0)
 	sw	a0, (s1)
@@ -94,7 +96,9 @@ LEAF(copy_to_ram)
 	/* Jump to RAM */
 	subu	t1, s1
 	subu	ra, t1
-1:	jr	ra
+	jr	ra
+1:	move	s1, t1
+	jr	ra
 END(copy_to_ram)
 
 LEAF(initstack)
@@ -104,4 +108,5 @@ LEAF(initstack)
 END(initstack)
 
 DEFINE_STRING(__test_serial, "\r\nSerial Initialization Success\r\n\0")
+DEFINE_STRING(__bootmain_msg, "Entering bootmain()\r\n\0")
 DEFINE_STRING(__crlf, "\r\n\0")

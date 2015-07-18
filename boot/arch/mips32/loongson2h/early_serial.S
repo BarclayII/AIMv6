@@ -8,7 +8,6 @@
  *
  */
 
-#define UART_BASE		0xbfe80000
 #define MASTER_INPUT_CLOCK	(125000000 / 16)
 #define BAUD_RATE		115200
 
@@ -16,6 +15,7 @@
 #include <asm/asm.h>
 #include <asm/regdef.h>
 #include <asm/cp0regdef.h>
+#include <asm/addrspace.h>
 #include <drivers/serial/uart16550.h>
 
 /*
@@ -36,7 +36,7 @@
  * Initialize serial
  */
 LEAF(initserial)
-	li	v0, UART_BASE
+	li	v0, UART_BASE + IO_BASE
 
 	/* Disable interrupts */
 	sb	zero, UART_INTR_ENABLE(v0)
@@ -69,7 +69,7 @@ LEAF(initserial)
 END(initserial)
 
 LEAF(charserial)
-	li	v0, UART_BASE
+	li	v0, UART_BASE + IO_BASE
 1:	lb	t8, UART_LINE_STATUS(v0)
 	andi	t8, UART_LSR_THRE
 	beqz	t8, 1b

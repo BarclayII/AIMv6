@@ -19,6 +19,7 @@ SUDO		=
 ########  END  CONFIG ########
 
 ROOTDIR		=  $(shell pwd)
+UPPERMACH	=  $(shell echo $(MACH) | tr a-z- A-Z_)
 
 CC		=  $(CROSS_COMPILE)gcc
 CPP		=  $(CROSS_COMPILE)cpp
@@ -29,6 +30,7 @@ INCFLAG		=  -I. -I./include -I./include/arch/$(ARCH)
 
 CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=32 -fno-builtin
 CFLAGS		+= -nostdinc -nostdlib -g -mips32r2 -EL $(INCFLAG)
+CFLAGS		+= -DMACH_$(UPPERMACH)
 
 LDSCRIPT	=  boot/arch/$(ARCH)/$(MACH)/ldscript.ld
 LDFLAGS		=  -EL -N -T$(LDSCRIPT)
@@ -36,7 +38,9 @@ LDFLAGS		=  -EL -N -T$(LDSCRIPT)
 OBJS		=  boot/arch/$(ARCH)/$(MACH)/entry.o \
 		   boot/arch/$(ARCH)/$(MACH)/early_serial.o \
 		   boot/arch/$(ARCH)/$(MACH)/dummy.o \
-		   boot/arch/$(ARCH)/$(MACH)/bootmain.o
+		   boot/arch/$(ARCH)/$(MACH)/bootmain.o \
+		   drivers/serial/uart16550.o \
+		   lib/libc/stdio/snprintf.o
 
 BINARY		=  bootstrap
 DISASSEMBLY	=  $(BINARY).s

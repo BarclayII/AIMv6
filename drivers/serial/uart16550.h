@@ -140,6 +140,9 @@
 
 #ifndef __ASSEMBLER__
 
+#include <sys/types.h>
+#include <asm/prim.h>
+
 /*
  * TODO: implement inb() and outb() somewhere.
  * i386 CPUs access UART via in and out instructions, while MIPS do so
@@ -150,6 +153,8 @@
 
 unsigned char uart16550_spin_getbyte(void);
 void uart16550_spin_putbyte(unsigned char byte);
+void uart_spin_puts(const char *str);
+ssize_t uart_spin_printf(const char *fmt, ...);
 
 #endif
 
