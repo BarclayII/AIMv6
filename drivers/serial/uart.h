@@ -16,10 +16,8 @@
 
 #ifdef UART16550
 #include <drivers/serial/uart16550.h>
-#endif
-
-#ifdef UART_XILINX
-#include <drivers/serial/uart-xilinx.h>
+#elif defined UART_ZYNQ7000
+#include <drivers/serial/uart-zynq7000.h>
 #endif
 
 void uart_spin_puts(const char *str);

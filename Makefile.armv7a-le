@@ -1,0 +1,50 @@
+# Copyright (C) 2015 David Gao <davidgao1001@gmail.com>
+#
+# This program is free software; you can redistribute  it and/or modify it
+# under  the terms of  the GNU General  Public License as published by the
+# Free Software Foundation;  either version 2 of the  License, or (at your
+# option) any later version.
+
+# Makefile for ARMv7A-LE
+
+######## BEGIN CONFIG ########
+CROSS_COMPILE	=  arm-unknown-eabi-
+
+MACH		=  zynq7000
+########  END  CONFIG ########
+
+ROOTDIR		=  $(shell pwd)
+UPPERMACH	=  $(shell echo $(MACH) | tr a-z- A-Z_)
+
+CC		=  $(CROSS_COMPILE)gcc
+CPP		=  $(CROSS_COMPILE)cpp
+LD		=  $(CROSS_COMPILE)ld
+OBJDUMP		=  $(CROSS_COMPILE)objdump
+
+INCFLAG		=  -I. -I./include -I./include/arch/$(ARCH)
+
+CFLAGS		=  -fPIC -Wall -fno-builtin -nostdinc -nostdlib -g -Os
+CFLAGS		+= -mlittle-endian $(INCFLAG) -DMACH_$(UPPERMACH)
+
+LDSCRIPT	=  boot/arch/$(ARCH)/$(MACH)/ldscript.ld
+LDFLAGS		=  -EL -O -N -T $(LDSCRIPT)
+
+OBJS		=  drivers/serial/uart-zynq7000.o \
+		   drivers/serial/uart.o \
+		   lib/libc/stdio/snprintf.o
+
+MBR_BIN		=  mbr
+
+all: mbr
+
+mbr: $(OBJS)
+	$(LD) $(LDFLAGS) -o $(MBR_BIN) $(OBJS)
+#	$(OBJDUMP) -S $(MBR_BIN) >$(MBR_BIN).s
+
+clean:
+	rm -rf $(OBJS) $(MBR_BIN) $(MBR_BIN).s
+
+.S.o:
+	$(CC) $(CFLAGS) -c $< -o $*.o
+
+.PHONY: clean
