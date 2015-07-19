@@ -25,4 +25,11 @@
 #define member_to_struct(addr, struct, member_name) \
 	((struct *)((unsigned long)(addr) - MEMBER_OFFSET(struct, member_name)))
 
+static inline void delay(unsigned int t)
+{
+	unsigned int i;
+	for (i = 0; i < t * 10000; ++i)
+		/* nothing */;
+}
+
 #endif

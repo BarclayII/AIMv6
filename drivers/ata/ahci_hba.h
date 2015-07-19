@@ -19,7 +19,9 @@
 #ifndef _DRIVERS_ATA_AHCI_HBA_H
 #define _DRIVERS_ATA_AHCI_HBA_H
 
+#include <asm/io.h>
 #include <sys/types.h>
+#include <stddef.h>
 
 /*
  * Abbreviations:
@@ -106,7 +108,7 @@ struct ahci_hba_port {
 #define PORT_CMD_START	0x00000001	/* Start */
 
 #define PORT_CMD_CCS_SHIFT	8	/* Current Command Slot bit position */
-static inline uint ahci_hba_port_ccs(struct ahci_hba_port *port)
+static inline uint ahci_port_ccs(volatile struct ahci_hba_port *port)
 {
 	return (port->cmd & PORT_CMD_CCS) >> PORT_CMD_CCS_SHIFT;
 }
@@ -116,14 +118,36 @@ static inline uint ahci_hba_port_ccs(struct ahci_hba_port *port)
 #define PORT_TFD_STATUS_MASK	0x000000ff
 #define PORT_TFD_ERROR_SHIFT	8
 #define PORT_TFD_STATUS_SHIFT	0
-static inline uint ahci_hba_port_tfd_error(struct ahci_hba_port *port)
+static inline uint ahci_port_tfd_error(volatile struct ahci_hba_port *port)
 {
 	return (port->tfd & PORT_TFD_ERROR_MASK) >> PORT_TFD_ERROR_SHIFT;
 }
 
-static inline uint ahci_hba_port_tfd_status(struct ahci_hba_port *port)
+static inline uint ahci_port_tfd_status(volatile struct ahci_hba_port *port)
 {
 	return (port->tfd & PORT_TFD_STATUS_MASK) >> PORT_TFD_STATUS_SHIFT;
+}
+
+/* Port SStatus register */
+#define PORT_SSTAT_DET_MASK	0x0000000f
+# define PORT_SSTAT_DET_NONE	0x00000000
+# define PORT_SSTAT_DET_PRESENT	0x00000001
+# define PORT_SSTAT_DET_CONNECT	0x00000003
+# define PORT_SSTAT_DET_OFFLINE	0x00000004
+
+/* Port SControl register */
+#define PORT_SCNTL_DET_MASK	0x0000000f	/* Device initialization */
+# define PORT_SCNTL_DET_NONE	0x00000000
+# define PORT_SCNTL_DET_RESET	0x00000001
+# define PORT_SCNTL_DET_OFFLINE	0x00000004
+static inline void ahci_port_reset(volatile struct ahci_hba_port *port)
+{
+	port->scontrol = (port->scontrol & ~PORT_SCNTL_DET_MASK) |
+	    PORT_SCNTL_DET_RESET;
+	/* Delay for some time */
+	delay(1);
+	port->scontrol = (port->scontrol & ~PORT_SCNTL_DET_MASK) |
+	    PORT_SCNTL_DET_NONE;
 }
 
 /* 
@@ -217,6 +241,13 @@ static inline void ahci_disable_intr(volatile struct ahci_hba *hba)
 static inline void ahci_enable_intr(volatile struct ahci_hba *hba)
 {
 	hba->ghc |= HBA_GHC_IE;
+}
+
+static inline void ahci_hba_reset(volatile struct ahci_hba *hba)
+{
+	hba->ghc |= HBA_GHC_HR;
+	while (hba->ghc & HBA_GHC_HR)
+		/* nothing */;
 }
 
 /*

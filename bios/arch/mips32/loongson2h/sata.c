@@ -1,10 +1,21 @@
+/*
+ * Copyright (C) 2015 Gan Quan <coin2028@hotmail.com>
+ *
+ * This program is free software; you can redistribute  it and/or modify it
+ * under  the terms of  the GNU General  Public License as published by the
+ * Free Software Foundation;  either version 2 of the  License, or (at your
+ * option) any later version.
+ *
+ */
 
-#include <asm/prim.h>
-#include <drivers/ata/ahci_hba.h>
-#include <drivers/ata/ahci_fis.h>
+#include <stddef.h>
+#include <asm/io.h>
+#include <drivers/ata/ahci.h>
 #include <drivers/serial/uart.h>
 
 volatile struct ahci_hba *hba = (struct ahci_hba *)iomap(SATA_BASE);
+
+unsigned int hba_ports_available = 0;
 
 static inline void ahci_print_single_cap(const char *desc, unsigned int mask)
 {
@@ -66,10 +77,19 @@ void ahci_print_ports(volatile struct ahci_hba *hba)
 
 void sata_init(void)
 {
+	int port;
+	uart_spin_printf("Resetting controller...\r\n");
+	ahci_hba_reset(hba);
+	uart_spin_printf("Reset controller\r\n");
 	ahci_disable_intr(hba);
 	ahci_print_cap(hba);
 	ahci_print_ports(hba);
 
 	/* Disable Command Completion Coalescing */
 	ahci_disable_ccc(hba);
+
+	for (port = 0; port < 32; ++port) {
+		if (hba->ports_impl & (1 << port))
+			ahci_init_port(&hba->port[port]);
+	}
 }

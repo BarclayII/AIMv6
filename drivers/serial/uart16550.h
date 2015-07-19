@@ -141,7 +141,7 @@
 #ifndef __ASSEMBLER__
 
 #include <sys/types.h>
-#include <asm/prim.h>
+#include <asm/io.h>
 
 /*
  * TODO: implement inb() and outb() somewhere.
