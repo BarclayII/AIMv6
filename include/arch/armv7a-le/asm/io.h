@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef _IO_H
-#define _IO_H
+#ifndef _ASM_IO_H
+#define _ASM_IO_H
 
 /*
  * Basic IO for ARMv7A Little Endian machines.
@@ -46,7 +46,6 @@ static inline void out32(unsigned long addr, unsigned long data)
 {
 	*(volatile unsigned long *)addr = data;
 }
-
 
 #endif
 
