@@ -13,9 +13,15 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-void uart_spin_puts(const char *str)
+ssize_t uart_spin_printf(const char *fmt, ...)
 {
-	for (; *str != '\0'; ++str)
-		uart_spin_putbyte((unsigned char)*str);
+	int result;
+	va_list ap;
+	char printf_buf[BUFSIZ];
+	va_start(ap, fmt);
+	result = vsnprintf(printf_buf, BUFSIZ, fmt, ap);
+	uart_spin_puts(printf_buf);
+	va_end(ap);
+	return result;
 }
 

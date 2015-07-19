@@ -21,84 +21,10 @@
 
 #include <sys/types.h>
 
-/* 
- * HBA Generic Host Control structure
- *
+/*
  * Abbreviations:
  * CCC		- Command Completion Coalescing (not used)
  * EM		- Enclosure Management (not used)
- */
-struct ahci_hba {
-	uint		cap;		/* Capability */
-	uint		ghc;		/* Global Host Control */
-	uint		intr_stat;	/* Interrupt Status */
-	uint		ports_impl;	/* Ports Implemented */
-	uint		version;	/* Version */
-	uint		ccc_ctl;	/* CCC Control */
-	uint		ccc_ports;	/* CCC Ports */
-	uint		em_loc;		/* EM Location */
-	uint		em_ctl;		/* EM Control */
-	uint		cap2;		/* Extended Capability */
-	uint		bohc;		/* BIOS/OS Handoff Control */
-};
-
-/*
- * Capability Register Bitmasks
- *
- * Abbreviations:
- * NCQ		- Native Command Queuing
- */
-#define HBA_CAP_S64A	0x80000000	/* 64-bit addressing support */
-#define HBA_CAP_SNCQ	0x40000000	/* NCQ Support */
-#define HBA_CAP_SSNTF	0x20000000	/* SNotification Register support */
-#define HBA_CAP_SMPS	0x10000000	/* Mechanical Presence Switch support */
-#define HBA_CAP_SSS	0x08000000	/* Staggered Spinup Support */
-#define HBA_CAP_SALP	0x04000000	/* Aggressive Link Power Support */
-#define HBA_CAP_SAL	0x02000000	/* Activity LED Support */
-#define HBA_CAP_SCLO	0x01000000	/* Command List Override Support */
-#define HBA_CAP_ISSMASK	0x00f00000	/* Interface Speed Support Bitmask */
-# define HBA_SPEED_GEN1	0x00100000	/* Gen 1 (1.5Gbps) */
-# define HBA_SPEED_GEN2	0x00200000	/* Gen 2 (3Gbps) */
-# define HBA_SPEED_GEN3 0x00300000	/* Gen 3 (6Gbps) */
-#define HBA_CAP_SAM	0x00040000	/* AHCI-only */
-#define HBA_CAP_SPM	0x00020000	/* Ports Multiplier Support */
-#define HBA_CAP_FBSS	0x00010000	/* FIS-based Switching Support */
-#define HBA_CAP_PMD	0x00008000	/* PIO Multiple Data Request Block */
-#define HBA_CAP_SSC	0x00004000	/* Slumber State Capable */
-#define HBA_CAP_PSC	0x00002000	/* Partial State Capable */
-#define HBA_CAP_SLOTS	0x00001f00	/* Number of command slots bitmask */
-# define HBA_CAP_SLOTS_SHIFT	8	/* Bit shift, maybe redundant */
-#define HBA_CAP_CCCS	0x00000080	/* CCC Support */
-#define HBA_CAP_EMS	0x00000040	/* EM Support */
-#define HBA_CAP_SXS	0x00000020	/* External SATA Support */
-#define HBA_CAP_PORTS	0x0000001f	/* Number of ports bitmask */
-# define HBA_CAP_PORTS_SHIFT	0	/* Bit shift, maybe redundant */
-
-static inline unsigned int ahci_hba_slots(volatile struct ahci_hba *hba)
-{
-	return (hba->cap & HBA_CAP_SLOTS) >> HBA_CAP_SLOTS_SHIFT;
-}
-
-static inline unsigned int ahci_hba_ports(volatile struct ahci_hba *hba)
-{
-	return ((hba->cap & HBA_CAP_PORTS) >> HBA_CAP_PORTS_SHIFT) + 1;
-}
-
-/*
- * Global Host Control Bitmasks
- */
-#define HBA_GHC_AE	0x80000000	/* AHCI Enable */
-#define HBA_GHC_MRSM	0x00000004	/* MSI Revert to Single Message */
-#define HBA_GHC_IE	0x00000002	/* Interrupt Enable */
-#define HBA_GHC_HR	0x00000001	/* HBA Reset */
-
-/*
- * Interrupt Status Register is merely a bitmap representing which port
- * generated an interrupt.
- *
- * Ports Implemented Register is another bitmap indicating available ports.
- *
- * Version Register... I don't care, mostly.
  */
 
 /*
@@ -106,24 +32,29 @@ static inline unsigned int ahci_hba_ports(volatile struct ahci_hba *hba)
  */
 
 struct ahci_hba_port {
-	uint		clb;		/* Command List Base Address Lower */
-	uint		clbu;		/* ... Upper */
-	uint		fb;		/* FIS Base Address Lower */
-	uint		fbu;		/* ... Upper */
-	uint		intr_status;	/* Interrupt Status */
-	uint		intr_enable;	/* Interrupt Enable */
-	uint		cmd;		/* Command and Status */
-	uint		reserved;
-	uint		tfd;		/* Task file data */
-	uint		sig;		/* Signature */
-	uint		sstatus;	/* SStatus */
-	uint		scontrol;	/* SControl */
-	uint		serror;		/* SError */
-	uint		sactive;	/* SActive */
-	uint		cmd_issue;	/* Command issue */
-	uint		snotification;	/* SNotification */
-	uint		fbs;		/* FIS-based switch control */
-	uint		dev_sleep;	/* Device sleep */
+	union {
+		struct {
+			uint	clb;		/* Command List Base Address */
+			uint	clbu;		/* ... Upper */
+			uint	fb;		/* FIS Base Address Lower */
+			uint	fbu;		/* ... Upper */
+			uint	intr_status;	/* Interrupt Status */
+			uint	intr_enable;	/* Interrupt Enable */
+			uint	cmd;		/* Command and Status */
+			uint	reserved;
+			uint	tfd;		/* Task file data */
+			uint	sig;		/* Signature */
+			uint	sstatus;	/* SStatus */
+			uint	scontrol;	/* SControl */
+			uint	serror;		/* SError */
+			uint	sactive;	/* SActive */
+			uint	cmd_issue;	/* Command issue */
+			uint	snotification;	/* SNotification */
+			uint	fbs;		/* FIS-based switch control */
+			uint	dev_sleep;	/* Device sleep */
+		};
+		unsigned char	data[0x80];
+	};
 };
 
 /* Interrupt Status and Interrupt Enable bits correspond to each other */
@@ -193,6 +124,178 @@ static inline uint ahci_hba_port_tfd_error(struct ahci_hba_port *port)
 static inline uint ahci_hba_port_tfd_status(struct ahci_hba_port *port)
 {
 	return (port->tfd & PORT_TFD_STATUS_MASK) >> PORT_TFD_STATUS_SHIFT;
+}
+
+/* 
+ * HBA Generic Host Control structure
+ */
+struct ahci_hba {
+	union {
+		struct {
+			uint	cap;		/* Capability */
+			uint	ghc;		/* Global Host Control */
+			uint	intr_stat;	/* Interrupt Status */
+			uint	ports_impl;	/* Ports Implemented */
+			uint	version;	/* Version */
+			uint	ccc_ctl;	/* CCC Control */
+			uint	ccc_ports;	/* CCC Ports */
+			uint	em_loc;		/* EM Location */
+			uint	em_ctl;		/* EM Control */
+			uint	cap2;		/* Extended Capability */
+			uint	bohc;		/* BIOS/OS Handoff Control */
+		};
+		unsigned char	data[0x100];
+	};
+	struct ahci_hba_port	port[32];
+};
+
+/*
+ * Capability Register Bitmasks
+ *
+ * Abbreviations:
+ * NCQ		- Native Command Queuing
+ */
+#define HBA_CAP_S64A	0x80000000	/* 64-bit addressing support */
+#define HBA_CAP_SNCQ	0x40000000	/* NCQ Support */
+#define HBA_CAP_SSNTF	0x20000000	/* SNotification Register support */
+#define HBA_CAP_SMPS	0x10000000	/* Mechanical Presence Switch support */
+#define HBA_CAP_SSS	0x08000000	/* Staggered Spinup Support */
+#define HBA_CAP_SALP	0x04000000	/* Aggressive Link Power Support */
+#define HBA_CAP_SAL	0x02000000	/* Activity LED Support */
+#define HBA_CAP_SCLO	0x01000000	/* Command List Override Support */
+#define HBA_CAP_ISSMASK	0x00f00000	/* Interface Speed Support Bitmask */
+# define HBA_SPEED_GEN1	0x00100000	/* Gen 1 (1.5Gbps) */
+# define HBA_SPEED_GEN2	0x00200000	/* Gen 2 (3Gbps) */
+# define HBA_SPEED_GEN3 0x00300000	/* Gen 3 (6Gbps) */
+#define HBA_CAP_SAM	0x00040000	/* AHCI-only */
+#define HBA_CAP_SPM	0x00020000	/* Ports Multiplier Support */
+#define HBA_CAP_FBSS	0x00010000	/* FIS-based Switching Support */
+#define HBA_CAP_PMD	0x00008000	/* PIO Multiple Data Request Block */
+#define HBA_CAP_SSC	0x00004000	/* Slumber State Capable */
+#define HBA_CAP_PSC	0x00002000	/* Partial State Capable */
+#define HBA_CAP_SLOTS	0x00001f00	/* Number of command slots bitmask */
+# define HBA_CAP_SLOTS_SHIFT	8	/* Bit shift, maybe redundant */
+#define HBA_CAP_CCCS	0x00000080	/* CCC Support */
+#define HBA_CAP_EMS	0x00000040	/* EM Support */
+#define HBA_CAP_SXS	0x00000020	/* External SATA Support */
+#define HBA_CAP_PORTS	0x0000001f	/* Number of ports bitmask */
+# define HBA_CAP_PORTS_SHIFT	0	/* Bit shift, maybe redundant */
+
+static inline unsigned int ahci_hba_slots(volatile struct ahci_hba *hba)
+{
+	return ((hba->cap & HBA_CAP_SLOTS) >> HBA_CAP_SLOTS_SHIFT) + 1;
+}
+
+static inline unsigned int ahci_hba_ports(volatile struct ahci_hba *hba)
+{
+	return ((hba->cap & HBA_CAP_PORTS) >> HBA_CAP_PORTS_SHIFT) + 1;
+}
+
+static inline bool ahci_support_ccc(volatile struct ahci_hba *hba)
+{
+	return !!(hba->cap & HBA_CAP_CCCS);
+}
+
+static inline bool ahci_support_em(volatile struct ahci_hba *hba)
+{
+	return !!(hba->cap & HBA_CAP_EMS);
+}
+
+/*
+ * Global Host Control Bitmasks
+ */
+#define HBA_GHC_AE	0x80000000	/* AHCI Enable */
+#define HBA_GHC_MRSM	0x00000004	/* MSI Revert to Single Message */
+#define HBA_GHC_IE	0x00000002	/* Interrupt Enable */
+#define HBA_GHC_HR	0x00000001	/* HBA Reset */
+
+static inline void ahci_disable_intr(volatile struct ahci_hba *hba)
+{
+	hba->ghc &= ~HBA_GHC_IE;
+}
+
+static inline void ahci_enable_intr(volatile struct ahci_hba *hba)
+{
+	hba->ghc |= HBA_GHC_IE;
+}
+
+/*
+ * Interrupt Status Register is merely a bitmap representing which port
+ * generated an interrupt.
+ *
+ * Ports Implemented Register is another bitmap indicating available ports.
+ *
+ * Version Register... I don't care, mostly.
+ */
+
+/*
+ * Command Completion Coalescing registers are manipulated via inline functions.
+ */
+#define HBA_CCC_CTL_TV_SHIFT	16
+#define HBA_CCC_CTL_TV_MASK	0xffff0000
+#define HBA_CCC_CTL_CC_SHIFT	8
+#define HBA_CCC_CTL_CC_MASK	0x0000ff00
+#define HBA_CCC_CTL_INT_SHIFT	3
+#define HBA_CCC_CTL_INT_MASK	0x000000f8
+#define HBA_CCC_CTL_ENABLE	0x00000001
+
+static inline uint ahci_ccc_gettimeout(volatile struct ahci_hba *hba)
+{
+	if (!ahci_support_ccc(hba))
+		return 0;
+	return (hba->ccc_ctl & HBA_CCC_CTL_TV_MASK) >> HBA_CCC_CTL_TV_SHIFT;
+}
+
+static inline void ahci_ccc_settimeout(volatile struct ahci_hba *hba, uint tv)
+{
+	if (!ahci_support_ccc(hba))
+		return;
+	hba->ccc_ctl = (hba->ccc_ctl & ~HBA_CCC_CTL_TV_MASK) |
+	    (tv << HBA_CCC_CTL_TV_SHIFT);
+}
+
+static inline uint ahci_ccc_getcc(volatile struct ahci_hba *hba)
+{
+	if (!ahci_support_ccc(hba))
+		return 0;
+	return (hba->ccc_ctl & HBA_CCC_CTL_CC_MASK) >> HBA_CCC_CTL_CC_SHIFT;
+}
+
+static inline void ahci_ccc_setcc(volatile struct ahci_hba *hba, uint cc)
+{
+	if (!ahci_support_ccc(hba))
+		return;
+	hba->ccc_ctl = (hba->ccc_ctl & ~HBA_CCC_CTL_CC_MASK) |
+	    (cc << HBA_CCC_CTL_CC_SHIFT);
+}
+
+static inline uint ahci_ccc_getintr(volatile struct ahci_hba *hba)
+{
+	if (!ahci_support_ccc(hba))
+		return 0;
+	return (hba->ccc_ctl & HBA_CCC_CTL_INT_MASK) >> HBA_CCC_CTL_INT_SHIFT;
+}
+
+static inline void ahci_ccc_setintr(volatile struct ahci_hba *hba, uint intr)
+{
+	if (!ahci_support_ccc(hba))
+		return;
+	hba->ccc_ctl = (hba->ccc_ctl & ~HBA_CCC_CTL_INT_MASK) |
+	    (intr << HBA_CCC_CTL_INT_SHIFT);
+}
+
+static inline void ahci_enable_ccc(volatile struct ahci_hba *hba)
+{
+	if (!ahci_support_ccc(hba))
+		return;
+	hba->ccc_ctl |= HBA_CCC_CTL_ENABLE;
+}
+
+static inline void ahci_disable_ccc(volatile struct ahci_hba *hba)
+{
+	if (!ahci_support_ccc(hba))
+		return;
+	hba->ccc_ctl &= ~HBA_CCC_CTL_ENABLE;
 }
 
 #endif

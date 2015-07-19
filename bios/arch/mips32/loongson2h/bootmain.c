@@ -10,14 +10,14 @@
 
 #include <drivers/serial/uart.h>
 
-extern void sata_print_cap(void);
+extern void sata_init(void);
 
 void bootmain(void)
 {
 	uart_spin_puts("Entered bootmain()\r\n");
 	uart_spin_printf("Jumping to C code at %08x\r\n", bootmain);
 
-	sata_print_cap();
+	sata_init();
 
 	for (;;)
 		/* nothing */;

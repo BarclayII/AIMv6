@@ -42,6 +42,7 @@ OBJS		=  bios/arch/$(ARCH)/$(MACH)/entry.o \
 		   bios/arch/$(ARCH)/$(MACH)/sata.o \
 		   drivers/serial/uart16550.o \
 		   drivers/serial/uart.o \
+		   drivers/serial/uart-printf.o \
 		   lib/libc/stdio/snprintf.o
 
 BINARY		=  bootstrap
