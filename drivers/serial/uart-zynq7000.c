@@ -45,13 +45,13 @@ void uart_init(void)
 void uart_enable(void)
 {
 	/* Enable TX and RX */
-	out32(UART_BASE + UART_OFFSET_CR, UART_TX_EN | UART_RX_EN);
+	out32(UART_BASE + UART_OFFSET_CR, UART_CR_TX_EN | UART_CR_RX_EN);
 }
 
 void uart_disable(void)
 {
 	/* Disable TX and RX */
-	out32(UART_BASE + UART_OFFSET_CR, UART_TX_DIS | UART_RX_DIS);
+	out32(UART_BASE + UART_OFFSET_CR, UART_CR_TX_DIS | UART_CR_RX_DIS);
 }
 
 unsigned char uart_spin_getbyte(void)
