@@ -225,4 +225,16 @@ struct fis_dma_data {
 	/* May follow up to 2048 DWORDs */
 };
 
+struct fis_recvbuf {
+	struct fis_dma_setup 	dsfis;
+	uint			pad0[1];
+	struct fis_pio_setup	psfis;
+	uint			pad1[3];
+	struct fis_reg_d2h	rfis;
+	uint			pad2[1];
+	struct fis_set_dev_bits	sdbfis;
+	unsigned char		ufis[64];
+	unsigned char		reserved[96];
+};
+
 #endif

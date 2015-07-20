@@ -14,6 +14,6 @@
 #include <drivers/ata/ahci_fis.h>
 #include <drivers/ata/ahci_hba.h>
 
-void ahci_init_port(volatile struct ahci_hba_port *port);
+unsigned int ahci_init_port(volatile struct ahci_hba_port *port);
 
 #endif

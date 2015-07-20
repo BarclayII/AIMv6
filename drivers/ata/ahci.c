@@ -8,11 +8,41 @@
  *
  */
 
+#include <string.h>
+#include <asm/mm/mmap.h>
 #include <drivers/ata/ahci.h>
-#include <drivers/serial/uart.h>
 
-void ahci_init_port(volatile struct ahci_hba_port *port)
+/*
+ * ahci_init_port(port): software initialization of HBA port
+ *
+ * Return value:
+ *     The content of SStatus register
+ *
+ * Reference:
+ * SATA 1.3 specification
+ */
+unsigned int ahci_init_port(volatile struct ahci_hba_port *port)
 {
-	uart_spin_printf("CLB: %08x:%08x\r\n", port->clbu, port->clb);
-	uart_spin_printf("FB : %08x:%08x\r\n", port->fb, port->fbu);
+	/* Physical address of a temporary FIS buffer */
+	unsigned long fb = TMPFB;
+
+	/* Halt FIS and command processing */
+	port->cmd &= ~(PORT_CMD_FRE | PORT_CMD_START);
+	while (port->cmd & (PORT_CMD_CR | PORT_CMD_FR))
+		/* nothing */;
+
+	/* Reset port */
+	port->scontrol = (port->scontrol & ~PORT_SCNTL_DET_MASK) |
+	    PORT_SCNTL_DET_RESET;
+	delay(1);
+	port->scontrol = (port->scontrol & ~PORT_SCNTL_DET_MASK) |
+	    PORT_SCNTL_DET_NONE;
+
+	/* TODO: initialize FIS buffer */
+	memset(
+
+	/* Enable FIS reception and spinup */
+	port->cmd |= PORT_CMD_FRE | PORT_CMD_SUD;
+	delay(1);
+	return port->sstatus;
 }

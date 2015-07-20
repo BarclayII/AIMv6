@@ -52,4 +52,7 @@
 #define IO_BASE		KSEG1
 #define KERNEL_BASE	KSEG0
 
+/* Physical address above HIGHPHY are not linearly mapped in MIPS32 */
+#define HIGHPHY		0x20000000
+
 #endif
