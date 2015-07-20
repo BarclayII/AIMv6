@@ -8,18 +8,11 @@
  *
  */
 
-#ifndef _DRIVERS_ATA_AHCI_H
-#define _DRIVERS_ATA_AHCI_H
+#ifndef _STRING_H
+#define _STRING_H
 
-#include <drivers/ata/ahci_fis.h>
-#include <drivers/ata/ahci_hba.h>
+#include <sys/types.h>
 
-unsigned int ahci_init_port(volatile struct ahci_hba_port *port);
-
-/*
- * See asm/addrspace.h for physical address space layout
- */
-#define SATA_OFFSET	0x8000
-#define SATAPHY		(DMAPHY + SATA_OFFSET)
+void *memset(void *dst, int c, size_t n);
 
 #endif

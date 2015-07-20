@@ -9,7 +9,7 @@
  */
 
 #include <string.h>
-#include <asm/mm/mmap.h>
+#include <asm/mm/page.h>
 #include <drivers/ata/ahci.h>
 
 /*
@@ -24,7 +24,8 @@
 unsigned int ahci_init_port(volatile struct ahci_hba_port *port)
 {
 	/* Physical address of a temporary FIS buffer */
-	unsigned long fb = TMPFB;
+	unsigned long fb = SATAPHY + CMDLIST_SIZE;
+	struct fis_recvbuf *fb_buf = (struct fis_recvbuf *)p2kv(fb);
 
 	/* Halt FIS and command processing */
 	port->cmd &= ~(PORT_CMD_FRE | PORT_CMD_START);
@@ -39,7 +40,7 @@ unsigned int ahci_init_port(volatile struct ahci_hba_port *port)
 	    PORT_SCNTL_DET_NONE;
 
 	/* TODO: initialize FIS buffer */
-	memset(
+	memset(fb_buf, 0, sizeof(struct fis_recvbuf));
 
 	/* Enable FIS reception and spinup */
 	port->cmd |= PORT_CMD_FRE | PORT_CMD_SUD;

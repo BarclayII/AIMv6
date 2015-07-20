@@ -52,7 +52,24 @@
 #define IO_BASE		KSEG1
 #define KERNEL_BASE	KSEG0
 
-/* Physical address above HIGHPHY are not linearly mapped in MIPS32 */
-#define HIGHPHY		0x20000000
+/* Physical address above MAXLOWERPHY are not linearly mapped in MIPS32 */
+#define MAXLOWERPHY	0x20000000
+#define DEVPHY		0x10000000
+#define DMAPHY		0x0b000000
+
+/*
+ * Physical address space layout:
+ * +------------------+	0		<--
+ * |  Kernel memory   |			 |
+ * +------------------+	DMAPHY		 Lower memory
+ * | Device RAM (DMA) |			 |
+ * +------------------+	DEVPHY		<--
+ * | Device Registers |
+ * +------------------+ MAXLOWERPHY
+ * |       ...        |
+ * +------------------+ UPPERMEMPHY
+ * |    User memory   |
+ * +------------------+ UPPERMEMPHY + RAMSIZE
+ */
 
 #endif

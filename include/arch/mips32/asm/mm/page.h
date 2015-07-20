@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef _ASM_MM_MMAP_H
-#define _ASM_MM_MMAP_H
+#ifndef _ASM_MM_PAGE_H
+#define _ASM_MM_PAGE_H
 
 #include <asm/addrspace.h>
 
