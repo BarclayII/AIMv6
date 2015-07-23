@@ -22,6 +22,7 @@
 #include <asm/io.h>
 #include <sys/types.h>
 #include <stddef.h>
+#include <drivers/ata/ahci_fis.h>
 
 /*
  * Abbreviations:
@@ -123,6 +124,7 @@ static inline uint ahci_port_tfd_error(volatile struct ahci_hba_port *port)
 	return (port->tfd & PORT_TFD_ERROR_MASK) >> PORT_TFD_ERROR_SHIFT;
 }
 
+/* The status field reflects that of the Device-to-Host FIS */
 static inline uint ahci_port_tfd_status(volatile struct ahci_hba_port *port)
 {
 	return (port->tfd & PORT_TFD_STATUS_MASK) >> PORT_TFD_STATUS_SHIFT;
@@ -134,6 +136,11 @@ static inline uint ahci_port_tfd_status(volatile struct ahci_hba_port *port)
 # define PORT_SSTAT_DET_PRESENT	0x00000001
 # define PORT_SSTAT_DET_CONNECT	0x00000003
 # define PORT_SSTAT_DET_OFFLINE	0x00000004
+#define PORT_SSTAT_IPM_MASK	0x00000f00
+# define PORT_SSTAT_IPM_ACTIVE	0x00000100
+# define PORT_SSTAT_IPM_PARTIAL	0x00000200
+# define PORT_SSTAT_IPM_SLUMBER	0x00000600
+# define PORT_SSTAT_IPM_DEVSLP	0x00000800
 
 /* Port SControl register */
 #define PORT_SCNTL_DET_MASK	0x0000000f	/* Device initialization */

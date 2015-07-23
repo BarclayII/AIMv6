@@ -25,11 +25,14 @@
 #define member_to_struct(addr, struct, member_name) \
 	((struct *)((unsigned long)(addr) - MEMBER_OFFSET(struct, member_name)))
 
-static inline void delay(unsigned int t)
+/*
+ * An extremely inaccurate busy-wait loop for delaying @t milliseconds
+ */
+static inline void delay(unsigned long t)
 {
-	unsigned int i;
+	register unsigned long i;
 	for (i = 0; i < t * 10000; ++i)
-		/* nothing */;
+		asm ("");
 }
 
 #endif

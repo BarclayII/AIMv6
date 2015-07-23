@@ -10,6 +10,7 @@
 
 #include <stddef.h>
 #include <asm/io.h>
+#include <asm/mm/page.h>
 #include <drivers/ata/ahci.h>
 #include <drivers/serial/uart.h>
 
@@ -78,7 +79,6 @@ void ahci_print_ports(volatile struct ahci_hba *hba)
 void sata_init(void)
 {
 	int port;
-	unsigned int sstatus;
 
 	uart_spin_printf("Resetting controller...\r\n");
 	ahci_hba_reset(hba);
@@ -90,14 +90,10 @@ void sata_init(void)
 	/* Disable Command Completion Coalescing */
 	ahci_disable_ccc(hba);
 
-	for (port = 0; port < 32; ++port) {
-		if (hba->ports_impl & (1 << port)) {
-			sstatus = ahci_init_port(&hba->port[port]);
-			if (sstatus & PORT_SSTAT_DET_MASK) {
-				uart_spin_printf("Port %d online\r\n", port);
-				hba_ports_available |= 1 << port;
-				ahci_init_port_buf(&hba->port[port]);
-			}
+	for (port = 0; port < 32; ++port)
+		if ((hba->ports_impl & (1 << port)) &&
+		    (ahci_init_port(&hba->port[port], NULL) == 0)) {
+			uart_spin_printf("Port %d is online\r\n", port);
+			hba_ports_available |= 1 << port;
 		}
-	}
 }

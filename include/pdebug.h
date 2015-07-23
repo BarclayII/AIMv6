@@ -8,17 +8,16 @@
  *
  */
 
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _PDEBUG_H
+#define _PDEBUG_H
 
-/* 
- * Include asm/config.h to include preset machine specific configurations,
- * which should be available on the manuals or documentations of those
- * machines.
- */
-#include <asm/config.h>
+#include <config.h>
 
-/* Other global configuration macros goes below. */
-#define DEBUG			/* enable pdebug() output */
+#ifdef DEBUG
+#include <drivers/serial/uart.h>
+#define pdebug(...)	uart_spin_printf(__VA_ARGS__)
+#else	/* !DEBUG */
+#define pdebug(...)
+#endif	/* DEBUG */
 
 #endif

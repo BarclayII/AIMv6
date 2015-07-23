@@ -236,8 +236,6 @@ struct fis_recvbuf {
 	unsigned char		ufis[64];
 	unsigned char		reserved[96];
 };
-#define FIS_RECVBUF_SIZE	0x100
-
-#define CMDLIST_SIZE		0x100
+#define AHCI_FIS_RECVBUF_SIZE	sizeof(struct fis_recvbuf)
 
 #endif

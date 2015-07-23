@@ -12,15 +12,17 @@
 #define _ASM_MM_PAGE_H
 
 #include <asm/addrspace.h>
+#include <stddef.h>
 
 static inline void *p2kv(unsigned long paddr)
 {
-	return (paddr < HIGHPHY) ? (void *)(addr + KSEG0) : NULL;
+	return (paddr < MAXLOWERPHY) ? (void *)(paddr + KSEG0) : NULL;
 }
 
 static inline unsigned long kv2p(const void *kvaddr)
 {
-	return (kvaddr <= KSEG0_END && kvaddr >= KSEG0_BEGIN) ?
+	return ((unsigned long)kvaddr <= KSEG0_END &&
+	    (unsigned long)kvaddr >= KSEG0_BASE) ?
 	    (unsigned long)kvaddr - KSEG0 : 0;
 }
 

@@ -8,17 +8,9 @@
  *
  */
 
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _DRIVERS_ATA_ATA_CMD_H
+#define _DRIVERS_ATA_ATA_CMD_H
 
-/* 
- * Include asm/config.h to include preset machine specific configurations,
- * which should be available on the manuals or documentations of those
- * machines.
- */
-#include <asm/config.h>
-
-/* Other global configuration macros goes below. */
-#define DEBUG			/* enable pdebug() output */
+#define ATA_IDENTIFY_DEVICE	0xec
 
 #endif
