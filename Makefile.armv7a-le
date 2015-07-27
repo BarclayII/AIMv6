@@ -40,6 +40,8 @@ MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootasm.o \
 
 all: preload.bin mbr.bin
 
+$(PRELOAD_OBJS): EXTRA_FLAGS := -O2
+
 preload: $(PRELOAD_OBJS) $(PRELOAD_LDS)
 	$(LD) $(LDFLAGS) -T $(PRELOAD_LDS) -o $@ $^
 
@@ -48,6 +50,8 @@ preload.bin: preload
 
 preload.s: preload
 	$(OBJDUMP) -S $^ > $@
+
+$(MBR_OBJS): EXTRA_FLAGS := -Os
 
 mbr: $(MBR_OBJS)
 	$(LD) $(LDFLAGS) -T boot/arch/$(ARCH)/$(MACH)/mbr.ld -o $@ $^

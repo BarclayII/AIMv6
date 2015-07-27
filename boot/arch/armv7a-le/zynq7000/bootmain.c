@@ -13,12 +13,14 @@
 #define PRELOAD_VECTOR_BASE	0x20000
 
 void (*uart_init)(void) = (void *)(PRELOAD_VECTOR_BASE + 0);
-void (*uart_spin_puts)(const char *) = (void *)(PRELOAD_VECTOR_BASE + 4);
+void (*uart_enable)(void) = (void *)(PRELOAD_VECTOR_BASE + 4);
+void (*uart_spin_puts)(const char *) = (void *)(PRELOAD_VECTOR_BASE + 8);
 
 void bootmain(void)
 {
-	//uart_init();
-	uart_spin_puts("Hello!\r\n");
+	uart_init();
+	uart_enable();
+	uart_spin_puts("\r\nHello!\r\n");
 	while(1);
 }
 
