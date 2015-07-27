@@ -20,31 +20,52 @@ CC		=  $(CROSS_COMPILE)gcc
 CPP		=  $(CROSS_COMPILE)cpp
 LD		=  $(CROSS_COMPILE)ld
 OBJDUMP		=  $(CROSS_COMPILE)objdump
+OBJCOPY		=  $(CROSS_COMPILE)objcopy
 
 INCFLAG		=  -I. -I./include -I./include/arch/$(ARCH)
 
-CFLAGS		=  -fPIC -Wall -fno-builtin -nostdinc -nostdlib -g -Os
+CFLAGS		=  -Wall -fno-builtin -nostdinc -nostdlib
 CFLAGS		+= -mlittle-endian $(INCFLAG) -DMACH_$(UPPERMACH)
 
-LDSCRIPT	=  boot/arch/$(ARCH)/$(MACH)/ldscript.ld
-LDFLAGS		=  -EL -O -N -T $(LDSCRIPT)
+LDFLAGS		=  -EL -O -N
 
-OBJS		=  drivers/serial/uart-zynq7000.o \
-		   drivers/serial/uart.o \
-		   lib/libc/stdio/snprintf.o
+PRELOAD_OBJS	=  boot/arch/$(ARCH)/$(MACH)/vector.o \
+		   drivers/serial/uart-zynq7000.o \
+		   drivers/serial/uart.o
 
-MBR_BIN		=  mbr
+PRELOAD_LDS	=  boot/arch/$(ARCH)/$(MACH)/preload.ld
 
-all: mbr
+MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootasm.o \
+		   boot/arch/$(ARCH)/$(MACH)/bootmain.o
 
-mbr: $(OBJS)
-	$(LD) $(LDFLAGS) -o $(MBR_BIN) $(OBJS)
-#	$(OBJDUMP) -S $(MBR_BIN) >$(MBR_BIN).s
+all: preload.bin mbr.bin
+
+preload: $(PRELOAD_OBJS) $(PRELOAD_LDS)
+	$(LD) $(LDFLAGS) -T $(PRELOAD_LDS) -o $@ $^
+
+preload.bin: preload
+	$(OBJCOPY) -O binary -S $^ $@
+
+preload.s: preload
+	$(OBJDUMP) -S $^ > $@
+
+mbr: $(MBR_OBJS)
+	$(LD) $(LDFLAGS) -T boot/arch/$(ARCH)/$(MACH)/mbr.ld -o $@ $^
+
+mbr.s: mbr
+	$(OBJDUMP) -S $^ > $@
+
+mbr.bin: mbr
+	$(OBJCOPY) -O binary -S $^ $@
 
 clean:
-	rm -rf $(OBJS) $(MBR_BIN) $(MBR_BIN).s
+	rm -rf $(PRELOAD_OBJS) preload preload.bin preload.s
+	rm -rf $(MBR_OBJS) mbr mbr.bin mbr.s
 
 .S.o:
-	$(CC) $(CFLAGS) -c $< -o $*.o
+	$(CC) $(CFLAGS) -c -o $*.o $<
+
+.c.o:
+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ -c $<
 
 .PHONY: clean
