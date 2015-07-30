@@ -29,7 +29,7 @@ OBJDUMP		=  $(CROSS_COMPILE)objdump
 INCFLAG		=  -I. -I./include -I./include/arch/$(ARCH)
 
 CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=32 -fno-builtin
-CFLAGS		+= -nostdinc -nostdlib -g -mips32r2 -EL $(INCFLAG)
+CFLAGS		+= -nostdinc -nostdlib -g -mips64r2 -EL $(INCFLAG)
 CFLAGS		+= -DMACH_$(UPPERMACH)
 
 LDSCRIPT	=  bios/arch/$(ARCH)/$(MACH)/ldscript.ld

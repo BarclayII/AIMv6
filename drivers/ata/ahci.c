@@ -58,6 +58,7 @@ void ahci_identify_device(volatile struct ahci_hba_port *port)
 	struct ahci_cmdhdr *ch = (struct ahci_cmdhdr *)p2kv(clb);
 	struct ahci_cmdslot *cs = (struct ahci_cmdslot *)p2kv(csb);
 	unsigned short *data = (unsigned short *)p2kv(db);
+	unsigned int fb = port->fb;
 	int i;
 
 	/* Fill in PRD */
@@ -71,16 +72,20 @@ void ahci_identify_device(volatile struct ahci_hba_port *port)
 	cs->ct.cfis.type = FIS_H2D_REG;
 	cs->ct.cfis.event = FIS_WRITE_CMD;
 	cs->ct.cfis.cmd = ATA_IDENTIFY_DEVICE;
+	cs->ct.cfis.lba.mode = 1;
+	cs->ct.cfis.nsec_l = 1;
 
 	/* Fill in command header */
 	memset(ch, 0, sizeof(*ch));
 	ch->cfl = sizeof(cs->ct.cfis) / sizeof(unsigned int);
 	ch->clear_on_ok = 1;
 	ch->prdtl = 1;
+	ch->prefetch = 1;
 	ch->ctba = kv2p(&cs->ct);
 	ch->ctbau = 0;
 
 	ahci_wait_port(port);
+	memset(data, 0, sizeof(*data) * 256);
 
 	/* Issue command! */
 	port->cmd_issue = 1;
@@ -94,11 +99,19 @@ void ahci_identify_device(volatile struct ahci_hba_port *port)
 			delay(10000);
 		}
 	} while (port->cmd_issue & 1);
+	if (port->intr_status) {
+		pdebug("\t\tInterrupt status %08x\r\n",
+		    port->intr_status);
+		pdebug("\t\tSError %08x\r\n", port->serror);
+		delay(10000);
+	}
 
 	/* Read data stored at the location indicated by PRD */
 	uart_spin_printf("\t\tIdentification Data\r\n");
 	for (i = 0; i < 256; ++i, ++data)
 		uart_spin_printf("%04x%s", *data, (i + 1) % 8 ? " " : "\r\n");
+
+	uart_spin_printf("%02x\r\n", *(unsigned char *)p2kv(fb));
 }
 
 /*
@@ -157,6 +170,8 @@ int ahci_init_port(volatile struct ahci_hba_port *port, unsigned int *serror)
 			*serror = port->serror;
 		port->serror = 0;
 		port->intr_status = 0;
+
+		uart_spin_printf("Signature: %08x\r\n", port->sig);
 
 		pdebug("Waiting...\r\n");
 		ahci_wait_port(port);
