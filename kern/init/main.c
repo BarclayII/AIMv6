@@ -23,7 +23,7 @@ void main(void)
 	 * 6.  Disk storage
 	 * 7.  SMP Startup
 	 *     a)  Slave CPUs should skip step 8.
-	 * 8.  Fork and Execve /sbin/init
+	 * 8.  Fork and load /sbin/init into process table
 	 * 9.  Enable scheduler
 	 */
 }
