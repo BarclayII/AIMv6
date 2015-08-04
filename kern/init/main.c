@@ -16,14 +16,44 @@ void main(void)
 	 * @davidgao @leon001 please review
 	 * 0.  Hardware probing etc.
 	 * 1.  Trap
-	 * 2.  Interrupt, including PIC, LAPIC, IOAPIC etc.
-	 * 3.  Memory mapping, including page tables, allocators etc.
-	 * 4.  Scheduler
-	 * 5.  File system
-	 * 6.  Disk storage
-	 * 7.  SMP Startup
-	 *     a)  Slave CPUs should skip step 8.
-	 * 8.  Fork and load /sbin/init into process table
-	 * 9.  Enable scheduler
+	 * 2.  SMP per-CPU setup
+	 * 3.  Interrupt, including PIC, LAPIC, IOAPIC etc.
+	 * 4.  Disk storage
+	 * 5.  Memory mapping, including page tables, allocators etc.
+	 *     a)  Swapping
+	 * 6.  Scheduler
+	 * 7.  File system
+	 * 8.  SMP Startup
+	 *     a)  Slave CPUs should skip to step 11
+	 * 9.  Fork and load /sbin/init into process table
+	 * 10. Enable swapping & scheduler
+	 * 11. Enter idle stage
 	 */
+	local_irq_disable();
+
+	trap_init();
+
+	smp_setup();
+
+	init_irq();
+
+	disk_init();
+
+	mm_init();
+
+	sched_init();
+
+	fs_init();
+
+	smp_startup();
+
+	userinit_init();
+
+	swap_enable();
+
+	/* Enable all interrupts including timer, thus enabling scheduler */
+	local_irq_enable();
+
+	/* We're now alive! */
+	cpu_idle();
 }
