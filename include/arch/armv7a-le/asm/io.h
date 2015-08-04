@@ -47,5 +47,5 @@ static inline void out32(unsigned long addr, unsigned long data)
 	*(volatile unsigned long *)addr = data;
 }
 
-#endif
+#endif /* _ASM_IO_H */
 
