@@ -10,6 +10,7 @@
 
 #define _DTB_C
 
+#include <sys/types.h>
 #include <config.h>
 #include <drivers/misc/dtb-zynq7000.h>
 

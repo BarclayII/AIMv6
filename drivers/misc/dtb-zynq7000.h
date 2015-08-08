@@ -8,10 +8,10 @@
  *
  */
 
-#include <config.h>
-
 #ifndef _DTB_H
 #define _DTB_H
+
+#include <sys/types.h>
 
 /* PHYSICAL BASE ADDRESS AS MACROS */
 /* See Zynq7000 APSoC TRM (Xilinx UG585) for details. */
@@ -87,5 +87,78 @@
 
 #define QSPI_LINEAR_PHYSBASE		0xFC000000
 #define OCM_PHYSBASE_HI			0xFFFC0000	/* size=256K */
+
+#ifndef _DTB_C
+
+extern u32	ocm_base;
+extern u32	ddr_base;
+extern u32	axi_gp0_base;
+extern u32	axi_gp1_base;
+extern u32	qspi_linear_base;
+
+extern u32	ddr_end;
+
+extern u32	uart0_base;
+extern u32	uart1_base;
+extern u32	usb0_base;
+extern u32	usb1_base;
+extern u32	i2c0_base;
+extern u32	i2c1_base;
+extern u32	spi0_base;
+extern u32	spi1_base;
+extern u32	can0_base;
+extern u32	can1_base;
+extern u32	gpio_base;
+extern u32	gem0_base;
+extern u32	gem1_base;
+extern u32	qspi_base;
+extern u32	smcc_base;
+
+extern u32	sd0_base;
+extern u32	sd1_base;
+
+extern u32	smc_nand_base;
+extern u32	smc_sram0_base;
+extern u32	smc_sram1_base;
+
+extern u32	slcr_base;
+extern u32	ttc0_base;
+extern u32	ttc1_base;
+extern u32	dmac0_s_base;
+extern u32	dmac0_ns_base;
+extern u32	swdt_base;
+extern u32	ddrc_base;
+extern u32	devcfg_base;
+extern u32	axi_hp0_base;
+extern u32	axi_hp1_base;
+extern u32	axi_hp2_base;
+extern u32	axi_hp3_base;
+extern u32	ocmc_base;
+
+extern u32	debug_dap_rom_base;
+extern u32	debug_etb_base;
+extern u32	debug_cti_etb_tpiu_base;
+extern u32	debug_tpiu_base;
+extern u32	debug_funnel_base;
+extern u32	debug_itm_base;
+extern u32	debug_cti_ftm_base;
+extern u32	debug_ftm_base;
+
+extern u32	debug_cpu_pmu0_base;
+extern u32	debug_cpu_pmu1_base;
+extern u32	debug_cpu_cti0_base;
+extern u32	debug_cpu_cti1_base;
+extern u32	debug_cpu_ptm0_base;
+extern u32	debug_cpu_ptm1_base;
+
+extern u32	gpv_trustzone_base;
+extern u32	gpv_qos301_cpu_base;
+extern u32	gpv_qos301_dmac_base;
+extern u32	gpv_qos301_iou_base;
+
+extern u32	mpcore_base;
+extern u32	l2cache_base;
+
+#endif /* _DTB_C */
 
 #endif /* _DTB_H */
