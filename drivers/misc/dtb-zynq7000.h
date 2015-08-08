@@ -88,6 +88,7 @@
 #define QSPI_LINEAR_PHYSBASE		0xFC000000
 #define OCM_PHYSBASE_HI			0xFFFC0000	/* size=256K */
 
+#ifdef KERNEL
 #ifndef _DTB_C
 
 extern u32	ocm_base;
@@ -160,5 +161,6 @@ extern u32	mpcore_base;
 extern u32	l2cache_base;
 
 #endif /* _DTB_C */
+#endif /* KERNEL */
 
 #endif /* _DTB_H */
