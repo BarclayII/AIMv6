@@ -5,17 +5,19 @@
 # Free Software Foundation;  either version 2 of the  License, or (at your
 # option) any later version.
 
-# Makefile for MIPS32
+# Makefile for MIPS64
 
 ######## BEGIN CONFIG ########
 CROSS_COMPILE	=  mips64-linux-gnu-
 
-MACH		=  loongson2h
+MACH		=  loongson3a
 
-INSTALLDIR	=  /srv/tftp
+INSTALLDEV	=  /dev/sdb
 
 # Only needed if the installation needs sudo privileges
-SUDO		=
+SUDO		=  sudo
+
+PARTNO		=  2
 ########  END  CONFIG ########
 
 ROOTDIR		=  $(shell pwd)
@@ -24,42 +26,48 @@ UPPERMACH	=  $(shell echo $(MACH) | tr a-z- A-Z_)
 CC		=  $(CROSS_COMPILE)gcc
 CPP		=  $(CROSS_COMPILE)cpp
 LD		=  $(CROSS_COMPILE)ld
+OBJCOPY		=  $(CROSS_COMPILE)objcopy
 OBJDUMP		=  $(CROSS_COMPILE)objdump
 
-INCFLAG		=  -I. -I./include -I./include/arch/$(ARCH)
+INCFLAG		=  -I$(ROOTDIR) -I$(ROOTDIR)/include
+INCFLAG		+= -I$(ROOTDIR)/include/arch/$(ARCH)
 
-CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=32 -fno-builtin
+CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=64 -fno-builtin
 CFLAGS		+= -nostdinc -nostdlib -g -mips64r2 -EL $(INCFLAG)
 CFLAGS		+= -DMACH_$(UPPERMACH)
 
-LDSCRIPT	=  bios/arch/$(ARCH)/$(MACH)/ldscript.ld
-LDFLAGS		=  -EL -N -T$(LDSCRIPT)
+LDSCRIPT	=  kern/arch/$(ARCH)/ldscript.ld
+LDFLAGS		=  -EL -N
 
-OBJS		=  bios/arch/$(ARCH)/$(MACH)/entry.o \
-		   bios/arch/$(ARCH)/$(MACH)/early_serial.o \
-		   bios/arch/$(ARCH)/$(MACH)/dummy.o \
-		   bios/arch/$(ARCH)/$(MACH)/bootmain.o \
-		   bios/arch/$(ARCH)/$(MACH)/sata.o \
+OBJS		=  kern/arch/$(ARCH)/start.o \
+		   kern/init/stub.o \
 		   drivers/serial/uart16550.o \
 		   drivers/serial/uart.o \
 		   drivers/serial/uart-printf.o \
-		   drivers/ata/ahci.o \
 		   lib/libc/stdio/snprintf.o \
 		   lib/libc/string/memset.o
 
 BINARY		=  bootstrap
 DISASSEMBLY	=  $(BINARY).s
 
-all: elf
+export
+
+all: elf boot
 
 elf: $(OBJS)
-	$(LD) $(LDFLAGS) -o $(BINARY) $(OBJS)
+	$(LD) $(LDFLAGS) -T $(LDSCRIPT) -o $(BINARY) $(OBJS)
 	$(OBJDUMP) -S $(BINARY) >$(DISASSEMBLY)
 
+boot: elf
+	cd boot && make -f Makefile.$(ARCH)
+
 install: all
-	$(SUDO) cp $(BINARY) $(INSTALLDIR)
+	cd boot && make -f Makefile.$(ARCH) install
+	$(SUDO) ./tools/arch/$(ARCH)/$(MACH)/install-kernel.pl \
+		$(INSTALLDEV) $(BINARY) $(PARTNO)
 
 clean:
+	cd boot && make -f Makefile.$(ARCH) clean
 	rm -rf $(OBJS) $(BINARY)
 
 uninstall:

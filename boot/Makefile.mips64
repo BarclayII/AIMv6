@@ -1,0 +1,41 @@
+# Copyright (C) 2015 Gan Quan <coin2028@hotmail.com>
+#
+# This program is free software; you can redistribute  it and/or modify it
+# under  the terms of  the GNU General  Public License as published by the
+# Free Software Foundation;  either version 2 of the  License, or (at your
+# option) any later version.
+
+# Makefile for MIPS64
+
+PREFIX		=  arch/$(ARCH)/$(MACH)/bootsect
+
+CFLAGS		=  -Os -G 0 -mno-abicalls -fno-pic -Wall -mabi=64 -fno-builtin
+CFLAGS		+= -nostdinc -nostdlib -g -mips64r2 -EL $(INCFLAG)
+CFLAGS		+= -DMACH_$(UPPERMACH)
+
+OBJS		=  $(PREFIX).o
+LDSCRIPT	=  $(PREFIX).ld
+ELF		=  $(PREFIX)
+BINARY		=  $(PREFIX).bin
+DISASSEMBLY	=  $(PREFIX).s
+
+BACKMBR		=  $(PREFIX).bak.mbr
+MBR		=  $(PREFIX).mbr
+ZERO		=  /dev/zero
+
+all: binary
+
+binary: $(OBJS)
+	$(LD) $(LDFLAGS) -T $(LDSCRIPT) -o $(ELF) $(OBJS)
+	$(OBJCOPY) -O binary $(ELF) $(BINARY)
+	$(OBJDUMP) -S $(ELF) > $(DISASSEMBLY)
+
+clean:
+	rm -f $(OBJS) $(ELF) $(BINARY) $(DISASSEMBLY) $(MBR)
+
+install: binary
+	$(SUDO) dd if=$(INSTALLDEV) of=$(BACKMBR) bs=512 count=1
+	dd if=$(ZERO) of=$(MBR) bs=512 count=1
+	dd if=$(BINARY) of=$(MBR) conv=notrunc
+	dd if=$(BACKMBR) of=$(MBR) bs=1 skip=446 seek=446 conv=notrunc
+	$(SUDO) dd if=$(MBR) of=$(INSTALLDEV) bs=512 count=1 conv=notrunc
