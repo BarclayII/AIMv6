@@ -11,7 +11,10 @@
 #ifndef _ASM_MACH_CONFIG_H
 #define _ASM_MACH_CONFIG_H
 
+#include <drivers/misc/dtb-zynq7000.h>
+
 #define UART_ZYNQ7000
+#define SD_ZYNQ7000
 
 #endif
 

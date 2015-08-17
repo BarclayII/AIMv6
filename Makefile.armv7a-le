@@ -24,7 +24,7 @@ OBJCOPY		=  $(CROSS_COMPILE)objcopy
 
 INCFLAG		=  -I. -I./include -I./include/arch/$(ARCH)
 
-CFLAGS		=  -Wall -fno-builtin -nostdinc -nostdlib
+CFLAGS		=  -Wall -fno-builtin -nostdinc -nostdlib -march=armv7-a
 CFLAGS		+= -mlittle-endian $(INCFLAG) -DMACH_$(UPPERMACH)
 
 LDFLAGS		=  -EL -O -N
