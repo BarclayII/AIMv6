@@ -16,46 +16,65 @@
 
 typedef void (*entry_t)();
 
-void __attribute__((noreturn)) _boot(int (*open)(const char *, int),
-    void (*close)(int),
-    long (*read)(int, void *, unsigned long),
-    unsigned long (*lseek)(int, unsigned long, int))
+/*
+ * PMON works in 32-bit, and so does MBR.
+ * Therefore things like "unsigned long long" should not appear in bootloader
+ * code.
+ */
+
+void __attribute__((noreturn)) _boot(int fd,
+    void (*findsect)(int, unsigned int),
+    long (*read)(int, void *, unsigned int),
+    unsigned long (*lseek)(int, unsigned int, int))
 {
 	int i, phnum;
-	int fd = open("wd0", 0);
 	entry_t entry;
 
 	unsigned int sector_start;
-	unsigned long pos, kernel_file_start;
+	unsigned int pos = 0;
 
 	unsigned char *buf = (unsigned char *)BUFFER;
 
 	unsigned char *part1 = ((unsigned char *)_boot) + PART1_ENTRY;
 
-	sector_start = *(unsigned int *)(part1 + PART_SECTOR_START);
-	kernel_file_start = pos = (unsigned long)sector_start * SECTOR_SIZE;
+	/*
+	 * GCC 4.4.0 (which is the version used by Loongson Tech.) had
+	 * difficulty dereferencing unaligned address.
+	 *
+	 * In MIPS, the addresses of load/store instructions other than
+	 * LWL, LWR, SWL, SWR must be *aligned*: LH/SH operates on
+	 * addresses aligned to 2 bytes, LW/SW on 4 bytes, etc.
+	 * Since (part1 + PART_SECTOR_START) is not aligned to 4 bytes,
+	 * directly dereferencing such address throws an exception.
+	 *
+	 * The latest GCC version does not have this bug.
+	 */
+	sector_start = *(unsigned short *)(part1 + PART_SECTOR_START + 2);
+	sector_start = (sector_start << 16) +
+	    *(unsigned short *)(part1 + PART_SECTOR_START);
 
-	lseek(fd, pos, 0);
+	findsect(fd, sector_start);
+
 	read(fd, buf, sizeof(struct elf64hdr));
+	if (*(unsigned int *)buf != 0x464c457f) {
+		goto fail;
+	}
 	pos += sizeof(struct elf64hdr);
 
-	if (*(unsigned int *)buf != ELFMAGIC)
-		goto fail;
+	struct elf64hdr *eh = (struct elf64hdr *)buf;
 
-	phnum = ((struct elf64hdr *)buf)->e_phnum;
-	entry = (entry_t)(((struct elf64hdr *)buf)->e_entry);
+	phnum = eh->e_phnum;
+	entry = (entry_t)(eh->e_entry);
 
 	for (i = 0; i < phnum; ++i) {
-		lseek(fd, pos, 0);
 		read(fd, buf, sizeof(struct elf64_phdr));
 		pos += sizeof(struct elf64_phdr);
-		if (((struct elf64_phdr *)buf)->p_type == PT_LOAD) {
-			lseek(fd, kernel_file_start +
-			    ((struct elf64_phdr *)buf)->p_offset,
-			    0);
-			read(fd,
-			    (char *)(((struct elf64_phdr *)buf)->p_vaddr),
-			    ((struct elf64_phdr *)buf)->p_filesz);
+		struct elf64_phdr *ph = (struct elf64_phdr *)buf;
+		if (ph->p_type == PT_LOAD) {
+			int off = (unsigned int)(ph->p_offset) - pos;
+			lseek(fd, off, 1);
+			read(fd, (unsigned char *)(ph->p_vaddr), ph->p_filesz);
+			lseek(fd, -off, 1);
 		}
 	}
 

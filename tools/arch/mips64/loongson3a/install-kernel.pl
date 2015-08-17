@@ -42,7 +42,7 @@ sysseek($fd_dev, 446 + 16 * ($partno - 1) + 8, SEEK_SET);
 sysread($fd_dev, $sector_start, 4);
 $sector_start = unpack("l", $sector_start);
 
-print "Writing from sector $sector_start...\n";
+print "Writing to sector $sector_start...\n";
 
 sysseek($fd_dev, $sector_start * 512, SEEK_SET);
 
