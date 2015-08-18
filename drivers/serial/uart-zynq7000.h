@@ -20,6 +20,13 @@
  * asm/mach-$MACH/config.h)
  */
 #include <config.h>
+#include <drivers/misc/dtb-zynq7000.h>
+
+#ifdef KERNEL
+#define UART_BASE	uart1_base
+#else /* KERNEL */
+#define UART_BASE	UART1_PHYSBASE
+#endif /* KERNEL */
 
 /* Register Offset */
 #define UART_OFFSET_CR		0x00
