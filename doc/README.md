@@ -8,8 +8,10 @@ files and are readable both under text viewers and GitHub.
 3. PDFs.  Documentations written in TeX are highly recommended to be compiled
 to PDFs.
 
-We assume that the users are familiar with Linux shell commands and programs
-in most documentations.  Those who are new to Linux or Unix-like systems
-are recommended to read the documentations under `unix` directory first.
+For lab users, move on to `labs/lab0-prerequisites.markdown` for introduction.
+
+For challengers, there's a `challenge` folder listing all challenges we could
+think of.  These challenges are about techniques, algorithms and ideas used
+in real world.
 
 (TODO: add documentation folder descriptions)
