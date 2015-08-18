@@ -24,8 +24,8 @@ typedef void (*entry_t)();
 
 void __attribute__((noreturn)) _boot(int fd,
     void (*findsect)(int, unsigned int),
-    long (*read)(int, void *, unsigned int),
-    unsigned long (*lseek)(int, unsigned int, int))
+    int (*read)(int, void *, unsigned int),
+    int (*lseek)(int, unsigned int, int))
 {
 	int i, phnum;
 	entry_t entry;
@@ -56,31 +56,32 @@ void __attribute__((noreturn)) _boot(int fd,
 	findsect(fd, sector_start);
 
 	read(fd, buf, sizeof(struct elf64hdr));
-	if (*(unsigned int *)buf != 0x464c457f) {
-		goto fail;
-	}
 	pos += sizeof(struct elf64hdr);
 
 	struct elf64hdr *eh = (struct elf64hdr *)buf;
 
 	phnum = eh->e_phnum;
-	entry = (entry_t)(eh->e_entry);
+	entry = (entry_t)(unsigned int)(eh->e_entry);
 
 	for (i = 0; i < phnum; ++i) {
-		read(fd, buf, sizeof(struct elf64_phdr));
+		if (read(fd, buf, sizeof(struct elf64_phdr)) == -1)
+			asm volatile ("break 8");
 		pos += sizeof(struct elf64_phdr);
 		struct elf64_phdr *ph = (struct elf64_phdr *)buf;
 		if (ph->p_type == PT_LOAD) {
 			int off = (unsigned int)(ph->p_offset) - pos;
-			lseek(fd, off, 1);
-			read(fd, (unsigned char *)(ph->p_vaddr), ph->p_filesz);
-			lseek(fd, -off, 1);
+			if (off != 0 && lseek(fd, off, 1) == -1)
+				asm volatile ("break 9");
+			if (read(fd,
+			    (unsigned char *)(unsigned int)(ph->p_vaddr),
+			    (unsigned int)(ph->p_filesz)) == -1)
+				asm volatile ("break 10");
+			if (off != 0 && lseek(fd, -off, 1) == -1)
+				asm volatile ("break 11");
 		}
 	}
 
 	(*entry)();
-fail:
-	asm volatile ("break 8");
 	for (;;)
 		/* nothing */;
 }

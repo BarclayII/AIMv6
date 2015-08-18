@@ -9,8 +9,8 @@
 
 PREFIX		=  arch/$(ARCH)/$(MACH)/bootsect
 
-CFLAGS		=  -Os -G 0 -mno-abicalls -fno-pic -Wall -mabi=64 -fno-builtin
-CFLAGS		+= -nostdinc -nostdlib -mips64r2 -EL $(INCFLAG)
+CFLAGS		=  -Os -G 0 -mno-abicalls -fno-pic -Wall -mabi=32 -fno-builtin
+CFLAGS		+= -nostdinc -nostdlib -mips32r2 -EL $(INCFLAG)
 CFLAGS		+= -DMACH_$(UPPERMACH)
 
 OBJS		=  $(PREFIX).o
