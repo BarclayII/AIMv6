@@ -12,21 +12,15 @@
 #define _ASM_MACH_CONFIG_H
 
 /*
- * Loongson 2H-specific configurations.
+ * Loongson 3A specific configurations.
  *
  * The hardware register addresses are preset by the manufacturer.
  */
 
 #define UART16550
 
-#define UART0_BASE	0x1fe80000
-#define UART1_BASE	0x1fe81000
-#define UART2_BASE	0x1fe82000
-#define UART3_BASE	0x1fe83000
+#define UART0_BASE	0x1fe001e0
 
 #define UART_BASE	UART0_BASE
-
-/* The SATA address is virtual in Loongson 2H User Manual. */
-#define SATA_BASE	0x1fe30000
 
 #endif
