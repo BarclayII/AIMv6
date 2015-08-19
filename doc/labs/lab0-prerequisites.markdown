@@ -3,6 +3,7 @@
 Designing an operating system certainly involves an *awful* amount of work.
 
 Before you take this experiments, you must prepare for:
+
 1. Reading a LOT of documentations, specifications, technical manuals, and
    anything else you can or can't imagine.  Some of them are detailed and
    self-evident, while others are poorly-written.  We will provide as much
@@ -28,6 +29,7 @@ Take a deep breath, and get yourself ready for your very first documentation.
 ### Setup
 
 To do your operating system experiments you need the following:
+
 1. A working Linux.
   * BSD or other Unix-like systems are OK if you can install GNU Compiler
     Collection (GCC).
@@ -47,10 +49,18 @@ To do your operating system experiments you need the following:
     + A serial-to-USB converter.
     + A SATA-to-USB converter.
 
-### Ramping up the ISAs
+### ISA and ABI
 
-Ramping up the ISAs involves heavy reading.  Prepare yourself to read long,
-boring, potentially poorly-documented manuals.
+*Instruction Set Architecture* includes data types, registers,
+instructions, addressing modes, interrupt and exception handling, and
+everything else one must understand for **writing programs in assemblies**.
+
+*Application Binary Interface* includes the specifications and conventions
+of register usage, function calls, stacks, and everything else one must
+understand for **writing programs in assemblies and C together**.
+
+Ramping up an ISA and an ABI involves heavy reading.  Prepare yourself to
+read long, boring, potentially poorly-documented manuals.
 
 Here are some warmups, however:
 
@@ -63,4 +73,3 @@ For MIPS developers:
   in our repository to avoid copyright issues, but you can probably find
   the electronic version on Internet.
 * Or you can get a first impression in `mips64-loongson3a/prereq.markdown`.
-
