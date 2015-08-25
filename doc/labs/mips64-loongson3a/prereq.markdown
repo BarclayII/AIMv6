@@ -172,4 +172,179 @@ Here is a list of common GNU assembler directives:
   branch delays.  This is enabled by default.
 5. `.set noat`: Does not allow reservation of `$1` as *assembler temporary
   register* (`at`).  See **Register convention** for details.
+6. `.set at`: Reserve `$1` for assembler use only, and user programs should
+  not use register `$1`.  See **Register convention** for details.  This is
+  enabled by default.
+
+### `<asm/asm.h>`
+
+The header file `<asm/asm.h>` (in `include/arch/mips64/asm/asm.h`) defines
+macros for defining subroutines and global symbols.
+
+1. `LEAF(symbol)`: Defines the start of a *leaf function*, that is, a
+  function with makes no further function calls.
+2. `NESTED(symbol, stack, retreg)`: Defines the start of a function which
+  makes other function calls.  `stack` indicates the stack size for this
+  function.  `retreg` is the register to be saved, which is usually
+  the return address register `$31`, or `$29` for exception handlers.
+3. `END(symbol)`: Marks the end of an assembly function.
+
+### Application Binary Interface
+
+From now on I'll introduce how assembly programs interact with C programs,
+which is called *application binary interface* (ABI).
+We don't want to write everything in assembly, after all.
+
+MIPS has two common ABIs, one for 32-bit processors, the other for
+64-bit ones.  For GCC, ABI could be specified by giving `-mabi` flag.
+
+##### Register conventions
+
+###### *Temporaries* and *statics*
+
+In almost all architectures the specifications somewhat designates a subset
+of registers whose values are to be preserved (that is, saved to memory)
+between function calls.  These registers are called *statics*, or
+*callee-saved registers*.  The callee (that is, the function being called)
+saves these registers into memory prior to entrance, and restores those
+registers after exiting.
+
+Other registers are called *temporaries*, or *caller-saved registers*.
+The values there need not be preserved between function calls, and therefore
+it's the responsibility of the caller (the function making calls) to
+preserve those registers.
+
+###### List of conventions
+
+MIPS processor introduces 32 general purpose registers (GPR).  Their
+conventions are listed below.
+
+1. `$0` (`zero`): **Hardwired zero**.  The value of this register is always
+  zero.
+2. `$1` (`at`): **Assembler temporary**.  This register is reserved for
+  assembler's use for performing arithmetic with large constants when
+  `.set at` is turned on.
+3. `$2` (`v0`): Stores return value of the function.
+4. `$3` (`v1`): Also stores return value of the function, although in
+  practice the compiler rarely does so.  Sometimes in 32-bit ABI
+  `v1` stores the high-order 32 bits for `long long` values.
+5. `$4` to `$7` (`a0` to `a3`): Stores the values of first four arguments
+  function.  Passing structures as arguments complicates things, but
+  passing pointers is a better programming practice anyway, as it
+  avoids unnecessary duplication of structures.
+6. `$8` to `$11`: The purposes are different between 32-bit and 64-bit ABI:
+  - `t0` to `t3`: Temporaries in 32-bit ABI.
+  - `a4` to `a7`: Stores the next four arguments of a function in 64-bit ABI.
+7. `$12` to `$15` (`t4` to `t7`): Temporaries.
+8. `$16` to `$23` (`s0` to `s7`): Statics.
+9. `$24` (`t8`): Temporary.
+10. `$25` (`t9`): Temporary, although it has other use in *position-independent
+  code* (PIC).
+11. `$26` and `$27` (`k0` and `k1`): Reserved for exception handlers, and
+  should NOT be used by anything else.
+12. `$28` (`gp`): *Global pointer*.
+13. `$29` (`sp`): *Stack pointer*, pointing to stack top.
+14. `$30` (`fp` or `s8`): *Frame pointer* in most cases for indicating the
+  stack bottom of current stack frame.  Rarely it's used as yet another
+  static.
+15. `$31` (`ra`): *Return address register*.  The hardware stores the return
+  address after execution of a branch-and-link.  Functions issue a `jr ra`
+  to exit itself.
+
+Only `s0` to `s7`, `sp`, `fp`, `ra` (and sometimes `gp`) are statics.  All
+other registers are temporaries.
+
+##### Data types
+
+|C type          |Assembler type|Size (bytes)|
+|:---------------|:-------------|:-----------|
+|`char`          |`byte`        |1           |
+|`short`         |`half`        |2           |
+|`int`           |`word`        |4           |
+|`long long`     |`dword`       |8           |
+|`float`         |`word`        |4           |
+|`double`        |`dword`       |8           |
+
+In 32-bit ABI `long` is equal to `int`, and in 64-bit ABI `long` is the same
+as `long long`.
+
+##### Endianness
+
+Big-endian puts high-order bits at lower address, while little-endian puts
+low-order ones at lower address.  For a word (`int`), the first byte stores
+bit 0..7 in little-endian processors, or 31..24 in big-endian ones.
+
+Loongson 3A is little-endian.
+
+##### Memory layout of structures
+
+Complex types (structures) are organized in memory by concatenating each
+primitive data type sequentially, inserting padding bytes to respect
+alignment rules (e.g. `short`s start on 2-byte boundaries, while
+`int`s start on 4-byte ones).
+
+An example is provided below:
+
+```C
+struct {
+	char	c;		/* byte 0 */
+	/* 1 byte padding */	/* byte 1 */
+	short	s;		/* byte 2-3 */
+	int	i;		/* byte 4-7*/
+	short	t;		/* byte 8-9 */
+	/* 6 bytes padding */	/* byte 10-15 */
+	long long ll;		/* byte 16-23 */
+};
+```
+
+`packed` attribute in GNU C breaks alignment rules and does not introduce
+any padding.  Make sure that the compiler generates correct code!  Old
+versions of GCC may be buggy in this matter.
+
+`aligned` attribute, in reverse, forces the compiler to arrange members
+to align to bytes specified.
+
+`#pragma pack` is a replacement of GNU-specific `packed` and `aligned`
+attributes.
+
+##### Stack
+
+The stack in MIPS convention grows downward, with stack top indicated by
+register `sp` (`$29`).
+
+The unit of stack growth is 8-bytes to include the longest primitive data type
+(`long long`).
+
+##### Argument passing
+
+###### Primitive argument passing
+
+In this section it's assumed that all arguments are of primitive data types
+(i.e. basic data types, and pointers).
+
+There are two ways of passing arguments, determined by number of arguments
+required:
+
+1. When the number of arguments is no more than 4 (8 in 64-bit), the values
+  are simply put inside argument registers `a0` to `a3` (`a0` to `a7` in
+  64-bit) in that order.
+2. When the number of arguments is more than 4 (8 in 64-bit), the caller
+  allocates from the stack an equal number of 8-bit *argument slots*.  The
+  first 4 (8 in 64-bit) slots from the lowest address are reserved, and the
+  slots thereafter contain the fifth (ninth in 64-bit) and more arguments
+  respectively.  The first 4 (8 in 64-bit) arguments are still placed in
+  `a0` to `a3` (`a0` to `a7` in 64-bit).
+
+###### Passing structures
+
+When someone does intend to pass a structure as argument.  The argument slots
+and registers are filled by the content of structure.  Therefore the number
+of allocated slots may grow, and may cause troubles when making calls to or
+from functions written in assembly.
+
+Therefore, although allowed and supported by C, directly passing structures is
+NOT recommended.  In most cases passing pointers of structures would suffice,
+since it's easier to write assemblies for interaction, and furthermore, takes
+less time and space by avoiding unnecessary duplication defined by C semantics.
+Use a `const` pointer for read-only access of a structure.
 
