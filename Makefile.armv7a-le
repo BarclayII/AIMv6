@@ -11,11 +11,13 @@
 CROSS_COMPILE	=  arm-unknown-eabi-
 
 MACH		=  zynq7000
+BOARD		=  zedboard
 ########  END  CONFIG ########
 
 ROOTDIR		=  $(shell pwd)
 UPPERMACH	=  $(shell echo $(MACH) | tr a-z- A-Z_)
 
+M4		=  m4
 CC		=  $(CROSS_COMPILE)gcc
 CPP		=  $(CROSS_COMPILE)cpp
 LD		=  $(CROSS_COMPILE)ld
@@ -29,11 +31,13 @@ CFLAGS		+= -mlittle-endian $(INCFLAG) -DMACH_$(UPPERMACH)
 
 LDFLAGS		=  -EL -O -N
 
-PRELOAD_OBJS	=  boot/arch/$(ARCH)/$(MACH)/vector.o \
+PRELOAD_OBJS	=  bios/arch/$(ARCH)/vector.o \
 		   drivers/serial/uart-zynq7000.o \
 		   drivers/serial/uart.o
 
-PRELOAD_LDS	=  boot/arch/$(ARCH)/$(MACH)/preload.ld
+PRELOAD_M4	=  bios/arch/$(ARCH)/preload.m4 \
+		   bios/arch/$(ARCH)/$(MACH)/chip.m4 \
+		   bios/arch/$(ARCH)/$(MACH)/$(BOARD)/board.m4
 
 MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootasm.o \
 		   boot/arch/$(ARCH)/$(MACH)/bootmain.o
@@ -42,8 +46,13 @@ all: preload.bin mbr.bin
 
 $(PRELOAD_OBJS): EXTRA_FLAGS := -O2
 
-preload: $(PRELOAD_OBJS) $(PRELOAD_LDS)
-	$(LD) $(LDFLAGS) -T $(PRELOAD_LDS) -o $@ $^
+preload.ld: $(PRELOAD_LDS)
+	$(M4) bios/arch/$(ARCH)/preload.m4 \
+	-I bios/arch/$(ARCH)/$(MACH)/ \
+	-I bios/arch/$(ARCH)/$(MACH)/$(BOARD)/ > $@
+
+preload: $(PRELOAD_OBJS) preload.ld
+	$(LD) $(LDFLAGS) -T preload.ld -o $@ $(PRELOAD_OBJS)
 
 preload.bin: preload
 	$(OBJCOPY) -O binary -S $^ $@
@@ -63,6 +72,7 @@ mbr.bin: mbr
 	$(OBJCOPY) -O binary -S $^ $@
 
 clean:
+	rm -f preload.ld
 	rm -rf $(PRELOAD_OBJS) preload preload.bin preload.s
 	rm -rf $(MBR_OBJS) mbr mbr.bin mbr.s
 
