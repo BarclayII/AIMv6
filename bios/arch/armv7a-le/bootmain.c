@@ -1,5 +1,3 @@
-changecom(`/*', `*/')
-changequote([,])
 /*
  * Copyright (C) 2015 David Gao <davidgao1001@gmail.com>
  *
@@ -10,28 +8,13 @@ changequote([,])
  *
  */
 
-sinclude([board.m4])
-sinclude([chip.m4])
+#include <drivers/serial/uart.h>
+#include <drivers/sd/sd-zynq7000.h>
 
-preload_size = 1M;
-
-SECTIONS
+void preload_bootmain(void)
 {
-	. = ORIGIN(RAM) + LENGTH(RAM) - preload_size;
-	.text . : {
-		*vector.o(.text)
-		*(.text)
-	}
-	.rodata . : {
-		*(.rodata)
-	}
-	.data . : {
-		*(.data)
-	}
-	.bss . : {
-		*(.bss)
-		*(COMMON)
-	}
+	uart_spin_puts("BIOS RUNNING.\r\n");
+	sd_init();
+	while (1);
 }
 
-ENTRY(preload_vector)

@@ -14,7 +14,7 @@
 .arm
 
 preload_vector:
-	b	preload_init
+	b	preload_bootasm
 	b	uart_init
 	b	uart_enable
 	b	uart_spin_puts

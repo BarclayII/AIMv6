@@ -32,8 +32,11 @@ CFLAGS		+= -mlittle-endian $(INCFLAG) -DMACH_$(UPPERMACH)
 LDFLAGS		=  -EL -O -N
 
 PRELOAD_OBJS	=  bios/arch/$(ARCH)/vector.o \
+		   bios/arch/$(ARCH)/bootasm.o \
+		   bios/arch/$(ARCH)/bootmain.o \
 		   drivers/serial/uart-zynq7000.o \
-		   drivers/serial/uart.o
+		   drivers/serial/uart.o \
+		   drivers/sd/sd-zynq7000.o
 
 PRELOAD_M4	=  bios/arch/$(ARCH)/preload.m4 \
 		   bios/arch/$(ARCH)/$(MACH)/chip.m4 \
@@ -42,11 +45,11 @@ PRELOAD_M4	=  bios/arch/$(ARCH)/preload.m4 \
 MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootasm.o \
 		   boot/arch/$(ARCH)/$(MACH)/bootmain.o
 
-all: preload.bin mbr.bin
+all: preload.bin
 
 $(PRELOAD_OBJS): EXTRA_FLAGS := -O2
 
-preload.ld: $(PRELOAD_LDS)
+preload.ld: $(PRELOAD_M4)
 	$(M4) bios/arch/$(ARCH)/preload.m4 \
 	-I bios/arch/$(ARCH)/$(MACH)/ \
 	-I bios/arch/$(ARCH)/$(MACH)/$(BOARD)/ > $@

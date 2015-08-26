@@ -1,5 +1,3 @@
-changecom(`/*', `*/')
-changequote([,])
 /*
  * Copyright (C) 2015 David Gao <davidgao1001@gmail.com>
  *
@@ -10,28 +8,13 @@ changequote([,])
  *
  */
 
-sinclude([board.m4])
-sinclude([chip.m4])
+.globl preload_bootasm
 
-preload_size = 1M;
+.text
+.arm
 
-SECTIONS
-{
-	. = ORIGIN(RAM) + LENGTH(RAM) - preload_size;
-	.text . : {
-		*vector.o(.text)
-		*(.text)
-	}
-	.rodata . : {
-		*(.rodata)
-	}
-	.data . : {
-		*(.data)
-	}
-	.bss . : {
-		*(.bss)
-		*(COMMON)
-	}
-}
+preload_bootasm:
+	ldr	sp, =preload_vector
+	movs	fp, sp
+	bl	preload_bootmain
 
-ENTRY(preload_vector)

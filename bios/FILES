@@ -1,22 +1,22 @@
 More suggestions are welcome.
 
-boot:
-This is the place for holding all bootloader-related sources.
-A separate Makefile is expected for building the bootloader.
+bios:
+This is the place for holding all pre-bootloader sources.
+A separate Makefile target is expected for building them.
 
-boot/arch/$(ARCH):
+bios/arch/$(ARCH):
 For architecture-dependent stuff, including arm, mips64, i386 (if any).
 
-boot/arch/$(ARCH)/$(MACH):
+bios/arch/$(ARCH)/$(MACH):
 Machine-dependent sources should go there.
 
-boot/include:
-For bootloader-specific architecture-independent headers.
+bios/include:
+For pre-bootloader architecture-independent headers.
 
-boot/arch/$(ARCH)/include/asm:
-Bootloader-specific architecture-dependent machine-independent headers should
+bios/arch/$(ARCH)/include/asm:
+Pre-bootloader architecture-dependent machine-independent headers should
 go there.
 
-boot/arch/$(ARCH)/include/asm/mach-$(MACH):
+bios/arch/$(ARCH)/include/asm/mach-$(MACH):
 Machine-dependent headers should go there.
 

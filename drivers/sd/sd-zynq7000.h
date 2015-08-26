@@ -23,12 +23,7 @@
 #define SD_BASE	SD0_PHYSBASE
 #endif /* KERNEL */
 
-/* ADMA2 Descriptor Struct */
-struct adma2desc {
-	u16	attr;
-	u16	leng;
-	u32	addr;
-};
+void sd_init();
 
 /* Register Offset */
 #define SD_SDMA_SYS_ADDR_OFFSET		0x00	/* u32 */
@@ -283,5 +278,4 @@ struct adma2desc {
 #define SD_CMD1_HIGH_VOL	0x00FF8000
 #define SD_CMD1_DUAL_VOL	0x00FF8010
 
-
-
+#endif /* _DRIVERS_SD_SD_ZYNQ7000_H */
