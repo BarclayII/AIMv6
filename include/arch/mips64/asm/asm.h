@@ -69,27 +69,6 @@ symbol:		.frame	sp, framesize, rpc
  */
 
 /*
- * ls - Load Symbol pseudo-instruction
- *
- * GCC 5 and newer versions support direct loading with li pseudo-instruction
- * like:
- *
- * 	li	t0, __end__
- *
- * where __end__ is a symbol.
- *
- * However, versions around GCC 4 doesn't, although symbol address could be
- * obtained in a slightly more awkward manner:
- *
- * 	la	t0, __end__(zero)
- *
- * ls pseudo-instruction is thus defined here to increase readability.
- */
-		.macro	ls	reg sym
-		la	\reg, \sym($0)
-		.endm
-
-/*
  * DEFINE_<TYPE> - Define a local <type> for current assembly source only
  * DEFINE_GLOBAL_<TYPE> - Define a global <type> shared across assembly files
  */

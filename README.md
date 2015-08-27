@@ -13,6 +13,8 @@ Remember to add license information on top of the source code :)
 This repository supersedes xv6-Loongson3A, the code from which will be migrated
 there.
 
+Please refer to the `doc` directory for documentations.
+
 ### Toolchain
 Ideally, the project should be compilable by the latest GCC (or cross-GCC if
 cross-compiling) toolchain available on either Linux distro.
