@@ -5,4 +5,6 @@
 # Free Software Foundation;  either version 2 of the  License, or (at your
 # option) any later version.
 
+# Read the ARCH variable passed in the command line, find the corresponding
+# architecture-specific Makefile, and load it.
 include Makefile.$(ARCH)

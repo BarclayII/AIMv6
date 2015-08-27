@@ -8,10 +8,28 @@
 # Makefile for MIPS64
 
 ######## BEGIN CONFIG ########
+
+# Cross-platform toolchain prefix.
+# E.g. if
+# 	CROSS_COMPILE = mips64-linux-gnu-
+# then the cross-compiler should be
+# 	mips64-linux-gnu-gcc
+# The linker should be
+# 	mips64-linux-gnu-ld
+# etc.
 CROSS_COMPILE	=  mips64-linux-gnu-
 
+# Machine name.
 MACH		=  loongson3a
 
+# Target device for kernel & bootloader installation.
+# 
+# IMPORTANT:
+# Make sure you select the correct device, or your own hard disk may become
+# corrupted!
+# I hadn't write the backup mechanism for kernel installation yet, but one
+# can recover MBR in case of accidents.  Refer to boot/Makefile.mips64 for
+# more information.
 INSTALLDEV	=  /dev/sdb
 
 CCOMPILER	=  gcc
@@ -19,10 +37,16 @@ CCOMPILER	=  gcc
 # Only needed if the installation needs sudo privileges
 SUDO		=  sudo
 
+# The partition number.  DO NOT CHANGE THIS.
 PARTNO		=  2
 ########  END  CONFIG ########
 
+# Retrieve root directory.
+# The expression $(shell <command>) executes the shell command and returns
+# the output.
 ROOTDIR		=  $(shell pwd)
+
+# Capitalize $MACH
 UPPERMACH	=  $(shell echo $(MACH) | tr a-z- A-Z_)
 
 CC		=  $(CROSS_COMPILE)$(CCOMPILER)
