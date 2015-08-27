@@ -33,6 +33,7 @@ To do your operating system experiments you need the following:
 1. A working Linux.
   * BSD or other Unix-like systems are OK if you can install GNU Compiler
     Collection (GCC).
+  * For those who work on ARM, GNU-M4 is also needed. We'll explain later.
 2. A cross-compiler suite.
   * Currently GNU Compiler Collection (GCC) is the only compiler suite
     we're supporting.  Preferably, it should be the latest version, but
@@ -43,8 +44,11 @@ To do your operating system experiments you need the following:
   * `vim(1)`, `emacs(1)`, `nano(1)`, ~~`ed(1)`~~ are all good choices.  You
     can also use IDEs as you wish.
 4. Other tools, software and hardware.
-  * ARM developers: make sure you have: (TODO: add hardware and software
-    requirements)
+  * ARM developers: make sure you have:
+    + A working SD or SDHC card. SDXC will fallback to SDHC's behavior but is
+      acceptable. Zedboard should have an SDHC included.
+    + A USB wire. The ones you charge your android phone are just ok. You may
+      need an extra wire if you want to try Vivado.
   * MIPS developers: make sure you have:
     + A serial-to-USB converter.
     + A SATA-to-USB converter.
@@ -64,7 +68,15 @@ read long, boring, potentially poorly-documented manuals.
 
 Here are some warmups, however:
 
-For ARM developers: move to (TODO: specify documentation location)
+For ARM developers:
+* Go directly to ARM infocenter (http://infocenter.arm.com/) and you should get
+  ALL the documents.
+* ARM has different ABIs and we use EABI. If you see GNUEABI, that's the
+  same thing.
+* ARM's ISA has *A LOT OF VERSIONS* and there are optional features.
+  Unfortunately integer division is one of them, and our core does not have it
+  implemented.
+* Remember, our processor core is Cortex-A9, which uses ARMv7A.
 
 For MIPS developers:
 * There's an excellent book named *See MIPS Run* which provides an in-depth
