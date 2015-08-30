@@ -312,9 +312,6 @@ attributes.
 The stack in MIPS convention grows downward, with stack top indicated by
 register `sp` (`$29`).
 
-The unit of stack growth is 8-bytes to include the longest primitive data type
-(`long long`).
-
 ##### Argument passing
 
 ###### Primitive argument passing
@@ -329,11 +326,18 @@ required:
   are simply put inside argument registers `a0` to `a3` (`a0` to `a7` in
   64-bit) in that order.
 2. When the number of arguments is more than 4 (8 in 64-bit), the caller
-  allocates from the stack an equal number of 8-bit *argument slots*.  The
+  allocates from the stack an equal number of 4-bit (8-bit in 64-bit)
+  *argument slots*.  The
   first 4 (8 in 64-bit) slots from the lowest address are reserved, and the
   slots thereafter contain the fifth (ninth in 64-bit) and more arguments
   respectively.  The first 4 (8 in 64-bit) arguments are still placed in
   `a0` to `a3` (`a0` to `a7` in 64-bit).
+
+Things become complicated when passing 64-bit arguments in registers in 32-bit
+ABI.  Usually each of these arguments is unpacked into 2 32-bit values, with
+high-order bits at higher argument register in little-endian (lower one if
+big-endian).  If the first argument does not occupy two registers, it is
+sign-extended to fit into two registers.
 
 ###### Passing structures
 
@@ -348,3 +352,7 @@ since it's easier to write assemblies for interaction, and furthermore, takes
 less time and space by avoiding unnecessary duplication defined by C semantics.
 Use a `const` pointer for read-only access of a structure.
 
+##### How does a function grow its stack frame
+
+The assembler precalculates the space it needs to store local variables, and
+to hold statics and arguments before making function calls.
