@@ -24,6 +24,7 @@
 #endif /* KERNEL */
 
 void sd_init();
+int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg);
 
 /* Register Offset */
 #define SD_SDMA_SYS_ADDR_OFFSET		0x00	/* u32 */

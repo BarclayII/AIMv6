@@ -147,4 +147,14 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg)
 	return 0;
 }
 
+/*
+ * initialize a card
+ * 0 = good
+ * 1 = no card
+ */
+int sd_spin_init_card()
+{
+	
+}
+
 #endif /* SD_ZYNQ7000 */
