@@ -51,7 +51,7 @@ void sd_init()
 	/* enable interrupt status except card */
 	tmp16 = SD_NORM_INTR_ALL & (~SD_INTR_CARD);
 	out16(SD_BASE + SD_NORM_INTR_STS_EN_OFFSET, tmp16);
-	out16(SD_BASE + SD_ERR_INTR_STS_EN_OFFSET, SD_ERROR_INTR_ALL);
+	out16(SD_BASE + SD_ERR_INTR_STS_EN_OFFSET, SD_ERR_INTR_ALL);
 
 	/* but disable all interrupt signals */
 	out16(SD_BASE + SD_NORM_INTR_SIG_EN_OFFSET, 0x0);
@@ -63,6 +63,88 @@ void sd_init()
 
 	/* set block size */
 	out16(SD_BASE + SD_BLK_SIZE_OFFSET, 512);
+}
+
+/* add descriptions to a command */
+u16 sd_frame_cmd(u16 cmd)
+{
+	switch (cmd) {
+		case SD_CMD0:
+		case SD_CMD4:
+			cmd |= SD_RESP_NONE; break;
+		case SD_ACMD6:
+		case SD_CMD7:
+		case SD_CMD10:
+		case SD_CMD12:
+		case SD_ACMD13:
+		case SD_CMD16:
+		case SD_ACMD42:
+		case SD_CMD52:
+		case SD_CMD55:
+			cmd |= SD_RESP_R1; break;
+		case SD_CMD17:
+		case SD_CMD18:
+		case SD_CMD23:
+		case SD_ACMD23:
+		case SD_CMD24:
+		case SD_CMD25:
+		case SD_ACMD51:
+			cmd |= SD_RESP_R1 | SD_DAT_PRESENT; break;
+		case SD_CMD5:
+			cmd |= SD_RESP_R1B; break;
+		case SD_CMD2:
+		case SD_CMD9:
+			cmd |= SD_RESP_R2; break;
+		case SD_CMD1:
+		case SD_ACMD41:
+			cmd |= SD_RESP_R3; break;
+		case SD_CMD3:
+			cmd |= SD_RESP_R6; break;
+		case SD_CMD6:
+			cmd |= SD_RESP_R1B; break;
+			/* for MMC card it is RESP_R1 | SD_DAT_PRESENT_SEL */
+		case SD_CMD8:
+			cmd |= SD_RESP_R1 | SD_DAT_PRESENT; break;
+			/* for MMC card it is RESP_R1 */
+	}
+	return cmd & 0x3FFF;
+}
+
+/*
+ * really send command
+ * 0 = good
+ * 1 = command inhibited
+ * 2 = command has data but data is inhibited
+ * 3 = controller reported error
+ */
+int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg)
+{
+	u32 state;
+	u16 result;
+	/* frame the command */
+	cmd = sd_frame_cmd(cmd);
+	/* do a state check */
+	state = in32(SD_BASE + SD_PRES_STATE_OFFSET);
+	if (state & SD_PSR_INHIBIT_CMD) return 1;
+	if ((state & SD_PSR_INHIBIT_DAT) && (cmd & SD_DAT_PRESENT)) return 2;
+	/* write block count */
+	out16(SD_BASE + SD_BLK_CNT_OFFSET, count);
+	out16(SD_BASE + SD_TIMEOUT_CTRL_OFFSET, 0xE);
+	/* write argument */
+	out32(SD_BASE + SD_ARGMT_OFFSET, arg);
+	out16(SD_BASE + SD_NORM_INTR_STS_OFFSET, SD_NORM_INTR_ALL);
+	out16(SD_BASE + SD_ERR_INTR_STS_OFFSET, SD_ERR_INTR_ALL);
+	/* write command */
+	out16(SD_BASE + SD_CMD_OFFSET, cmd);
+	/* wait for result */
+	do {
+		result = in16(SD_BASE + SD_NORM_INTR_STS_OFFSET);
+		if (result & SD_INTR_ERR) return 3;
+		/* We don't read error states, and we dont't clear them. */
+	} while(!(result & SD_INTR_CC));
+	/* Clear */
+	out16(SD_BASE + SD_NORM_INTR_STS_OFFSET, SD_INTR_CC);
+	return 0;
 }
 
 #endif /* SD_ZYNQ7000 */

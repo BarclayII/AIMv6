@@ -13,8 +13,11 @@
 
 void preload_bootmain(void)
 {
-	uart_spin_puts("BIOS RUNNING.\r\n");
+	uart_init();
+	uart_enable();
+	uart_spin_puts("Preload: Hello!\r\n");
 	sd_init();
+	uart_spin_puts("Preload: SD Controller initialized.\r\n");
 	while (1);
 }
 

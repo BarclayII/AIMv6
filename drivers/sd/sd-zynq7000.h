@@ -176,7 +176,7 @@ void sd_init();
 #define SD_INTR_CC		0x0001
 
 /* Error Interrupts */
-#define SD_ERROR_INTR_ALL	0xF3FF
+#define SD_ERR_INTR_ALL		0xF3FF
 #define SD_INTR_VEND_SPF_ERR	0xE000
 #define SD_INTR_ERR_TR		0x1000
 #define SD_INTR_ERR_ADMA	0x0200
@@ -195,7 +195,7 @@ void sd_init();
 #define SD_CMD_TYPE_ABORT	0xC0
 #define SD_CMD_TYPE_RESUME	0x80
 #define SD_CMD_TYPE_SUSPEND	0x40
-#define SD_DAT_PRESENT_SEL	0x20
+#define SD_DAT_PRESENT		0x20
 #define SD_CMD_INX_CHK_EN	0x10
 #define SD_CMD_CRC_CHK_EN	0x08
 #define SD_CMD_TYPE_NORM	0x00
@@ -207,42 +207,42 @@ void sd_init();
 
 /* Command */
 #define SD_CMD_MASK	0x3F00
-#define CMD0		0x0000
-#define CMD1		0x0100
-#define CMD2		0x0200
-#define CMD3		0x0300
-#define CMD4		0x0400
-#define CMD5		0x0500
-#define CMD6		0x0600
-#define CMD7		0x0700
-#define CMD8		0x0800
-#define CMD9		0x0900
-#define CMD10		0x0A00
-#define CMD12		0x0C00
-#define CMD16		0x1000
-#define CMD17		0x1100
-#define CMD18		0x1200
-#define CMD23		0x1700
-#define CMD24		0x1800
-#define CMD25		0x1900
-#define CMD41		0x2900
-#define CMD52		0x3400
-#define CMD55		0x3700
-#define CMD58		0x3A00
-#define ACMD6		0x8600
-#define ACMD13		0x8D00
-#define ACMD23		0x9700
-#define ACMD41		0xA900
-#define ACMD42		0xAA00
-#define ACMD51		0xB300
+#define SD_CMD0		0x0000
+#define SD_CMD1		0x0100
+#define SD_CMD2		0x0200
+#define SD_CMD3		0x0300
+#define SD_CMD4		0x0400
+#define SD_CMD5		0x0500
+#define SD_CMD6		0x0600
+#define SD_CMD7		0x0700
+#define SD_CMD8		0x0800
+#define SD_CMD9		0x0900
+#define SD_CMD10	0x0A00
+#define SD_CMD12	0x0C00
+#define SD_CMD16	0x1000
+#define SD_CMD17	0x1100
+#define SD_CMD18	0x1200
+#define SD_CMD23	0x1700
+#define SD_CMD24	0x1800
+#define SD_CMD25	0x1900
+#define SD_CMD41	0x2900
+#define SD_CMD52	0x3400
+#define SD_CMD55	0x3700
+#define SD_CMD58	0x3A00
+#define SD_ACMD6	0x8600
+#define SD_ACMD13	0x8D00
+#define SD_ACMD23	0x9700
+#define SD_ACMD41	0xA900
+#define SD_ACMD42	0xAA00
+#define SD_ACMD51	0xB300
 
 /* Response */
-#define RESP_NONE	SD_CMD_RESP_NONE
-#define RESP_R1		(SD_CMD_RESP_L48 | SD_CMD_CRC_CHK_EN | SD_CMD_INX_CHK_EN)
-#define RESP_R1B	(SD_CMD_RESP_L48_BSY_CHK | SD_CMD_CRC_CHK_EN | SD_CMD_INX_CHK_EN)
-#define RESP_R2		(SD_CMD_RESP_L136 | SD_CMD_CRC_CHK_EN)
-#define RESP_R3		(SD_CMD_RESP_L48)
-#define RESP_R6		(SD_CMD_RESP_L48_BSY_CHK | SD_CMD_CRC_CHK_EN | SD_CMD_INX_CHK_EN)
+#define SD_RESP_NONE	SD_CMD_RESP_NONE
+#define SD_RESP_R1	(SD_CMD_RESP_L48 | SD_CMD_CRC_CHK_EN | SD_CMD_INX_CHK_EN)
+#define SD_RESP_R1B	(SD_CMD_RESP_L48_BSY_CHK | SD_CMD_CRC_CHK_EN | SD_CMD_INX_CHK_EN)
+#define SD_RESP_R2	(SD_CMD_RESP_L136 | SD_CMD_CRC_CHK_EN)
+#define SD_RESP_R3	(SD_CMD_RESP_L48)
+#define SD_RESP_R6	(SD_CMD_RESP_L48_BSY_CHK | SD_CMD_CRC_CHK_EN | SD_CMD_INX_CHK_EN)
 
 /* Capabilities */
 #define SD_CAP_SPI_MODE		0x20000000
