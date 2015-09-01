@@ -22,8 +22,9 @@ unsigned long cpu_freq;
 void probe_count_freq(void)
 {
 	unsigned int cnt, cnt_new, i, sec;
+	unsigned long count_inc;
 	cnt = read_c0_count();
-	cpu_freq = 0;
+	count_inc = 0;
 
 	for (i = 0; i < NR_FREQ_SAMPLES + 1; ++i) {
 		sec = rtc_getsecond();
@@ -32,18 +33,22 @@ void probe_count_freq(void)
 			cnt_new = read_c0_count();
 		} while (rtc_getsecond() == sec);
 		if (i != 0)
-			cpu_freq += cnt_new - cnt;
+			count_inc += cnt_new - cnt;
 	}
 
-	cpu_freq /= NR_FREQ_SAMPLES;
-	cpu_freq *= COUNT_RATE;
+	count_inc /= NR_FREQ_SAMPLES;
+
+	/* 
+	 * The rate of increasing COUNT register on MIPS really depends on
+	 * implementation.
+	 */
+	cpu_freq = COUNT_TO_FREQ(count_inc);
 }
 
 void clock_init(void)
 {
+	uart_spin_printf("Initializing Real Time Clock (RTC)...\r\n");
 	rtc_init();
-	probe_count_freq();
-
 	uart_spin_printf(
 	    "Current time: %04d-%02d-%02d %02d:%02d:%02d\r\n",
 	    rtc_getyear(),
@@ -53,6 +58,9 @@ void clock_init(void)
 	    rtc_getminute(),
 	    rtc_getsecond()
 	);
+
+	uart_spin_printf("Determining CPU frequency...\r\n");
+	probe_count_freq();
 	uart_spin_printf("CPU frequency: %u\r\n", cpu_freq);
 }
 
