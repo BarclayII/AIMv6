@@ -9,6 +9,11 @@
  */
 
 #include <drivers/serial/uart.h>
+/* 
+ * TODO: add setup_arch() for hardware probing/detection/anything funny for
+ * each architecture.  The function should be declared in asm/setup.h.
+ */
+#include <asm/setup.h>
 
 int main(void)
 {

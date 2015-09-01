@@ -80,7 +80,8 @@ LDFLAGS		=  -EL -N
 
 # All object files
 OBJS		=  kern/arch/$(ARCH)/start.o \
-		   kern/init/stub.o \
+		   kern/arch/$(ARCH)/setup.o \
+		   kern/init/main.o \
 		   drivers/serial/uart16550.o \
 		   drivers/serial/uart.o \
 		   drivers/serial/uart-printf.o \
