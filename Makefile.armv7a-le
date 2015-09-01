@@ -23,6 +23,7 @@ OBJDUMP		=  $(CROSS_COMPILE)objdump
 OBJCOPY		=  $(CROSS_COMPILE)objcopy
 
 INCFLAG		=  -I. -I./include -I./include/arch/$(ARCH)
+INCFLAG		+= -I./include/arch/$(ARCH)/asm/mach-$(MACH)
 
 CFLAGS		=  -Wall -fno-builtin -nostdinc -nostdlib
 CFLAGS		+= -mlittle-endian $(INCFLAG) -DMACH_$(UPPERMACH)

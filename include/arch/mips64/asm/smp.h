@@ -8,19 +8,19 @@
  *
  */
 
-#ifndef _ASM_MACH_CONFIG_H
-#define _ASM_MACH_CONFIG_H
+#ifndef _ASM_SMP_H
+#define _ASM_SMP_H
 
-/*
- * Loongson 3A specific configurations.
- *
- * The hardware register addresses are preset by the manufacturer.
- */
+#include <asm/mipsregs.h>
 
-#define UART16550
+#ifndef cpuid
 
-#define UART0_BASE	0x1fe001e0
+inline unsigned int __cpuid(void)
+{
+	return read_c0_ebase() & EBASE_CPUNUM_MASK;
+}
 
-#define UART_BASE	UART0_BASE
+#define cpuid()		__cpuid()
+#endif	/* !defined(cpuid) */
 
 #endif

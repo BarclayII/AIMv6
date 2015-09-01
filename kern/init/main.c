@@ -8,12 +8,11 @@
  *
  */
 
-void main(void)
+#include <drivers/serial/uart.h>
+
+int main(void)
 {
 	/*
-	 * Startup routine.
-	 * Somehow combined the one in xv6 with that in Linux.
-	 * @davidgao @leon001 please review
 	 * 0.  Hardware probing etc.
 	 * 1.  Trap
 	 * 2.  SMP per-CPU setup
@@ -29,31 +28,9 @@ void main(void)
 	 * 10. Enable swapping & scheduler
 	 * 11. Enter idle stage
 	 */
-	local_irq_disable();
+	uart_spin_printf("Hello from kernel!\r\n");
 
-	trap_init();
-
-	smp_setup();
-
-	init_irq();
-
-	disk_init();
-
-	mm_init();
-
-	sched_init();
-
-	fs_init();
-
-	smp_startup();
-
-	userinit_init();
-
-	swap_enable();
-
-	/* Enable all interrupts including timer, thus enabling scheduler */
-	local_irq_enable();
-
-	/* We're now alive! */
-	cpu_idle();
+	/* 0. */
+	setup_arch();
 }
+

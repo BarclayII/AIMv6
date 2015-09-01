@@ -24,9 +24,7 @@
 /*
  * Include machine-specific configurations.
  */
-#ifdef MACH_LOONGSON3A
-#include <asm/mach-loongson3a/config.h>
-#endif
+#include <mach/config.h>
 
 /* Other architecture configuration macros goes below. */
 

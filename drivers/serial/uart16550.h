@@ -144,12 +144,12 @@
 #include <asm/io.h>
 
 /*
- * TODO: implement inb() and outb() somewhere.
+ * TODO: implement in8() and out8() somewhere.
  * i386 CPUs access UART via in and out instructions, while MIPS do so
  * by reading and writing memory-mapped registers.
  */
-#define UART_READ(reg)		inb(UART_BASE + (reg))
-#define UART_WRITE(reg, data)	outb(UART_BASE + (reg), data)
+#define UART_READ(reg)		in8(UART_BASE + (reg))
+#define UART_WRITE(reg, data)	out8(UART_BASE + (reg), data)
 
 void uart_init(void);
 void uart_enable(void);
