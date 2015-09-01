@@ -1,3 +1,5 @@
+changecom(`/*', `*/')
+changequote([,])
 /*
  * Copyright (C) 2015 David Gao <davidgao1001@gmail.com>
  *
@@ -8,13 +10,28 @@
  *
  */
 
-#ifndef _ASM_MACH_CONFIG_H
-#define _ASM_MACH_CONFIG_H
+sinclude([board.m4])
+sinclude([chip.m4])
 
-#include <drivers/misc/dtb-zynq7000.h>
+preload_size = 1M;
 
-#define UART_ZYNQ7000
-#define SD_ZYNQ7000
+SECTIONS
+{
+	. = ORIGIN(RAM) + LENGTH(RAM) - preload_size;
+	.text . : {
+		*vector.o(.text)
+		*(.text)
+	}
+	.rodata . : {
+		*(.rodata)
+	}
+	.data . : {
+		*(.data)
+	}
+	.bss . : {
+		*(.bss)
+		*(COMMON)
+	}
+}
 
-#endif
-
+ENTRY(preload_vector)

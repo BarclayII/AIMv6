@@ -33,6 +33,7 @@ To do your operating system experiments you need the following:
 1. A working Linux.
   * BSD or other Unix-like systems are OK if you can install GNU Compiler
     Collection (GCC).
+  * For those who work on ARM, GNU-M4 is also needed. We'll explain later.
 2. A cross-compiler suite.
   * Currently GNU Compiler Collection (GCC) is the only compiler suite
     we're supporting.  Preferably, it should be the latest version, but
@@ -40,11 +41,15 @@ To do your operating system experiments you need the following:
   * If you insist on using other compiler suites such as
     CLang/LLVM, you're welcome to contribute to our repository.
 3. A decent editor.
-  * `vim(1)`, `emacs(1)`, `nano(1)`, ~~`ed(1)`~~ are all good choices.  You
-    can also use IDEs as you wish.
+  * `vim(1)`, `emacs(1)`, `nano(1)`, ~~`ed(1)`~~ are all good choices.
+  * You can use `gedit` or `kate` or IDEs on GUIs if you like.
+  * Editors may need some configurations, try some before you start working.
 4. Other tools, software and hardware.
-  * ARM developers: make sure you have: (TODO: add hardware and software
-    requirements)
+  * ARM developers: make sure you have:
+    + A working SD or SDHC card. SDXC will fallback to SDHC's behavior but is
+      acceptable. Zedboard should have an SDHC included.
+    + A USB cable. The ones you charge your android phone are just ok. You may
+      need an extra cable if you want to try Vivado.
   * MIPS developers: make sure you have:
     + A serial-to-USB converter.
     + A SATA-to-USB converter.
@@ -64,12 +69,19 @@ read long, boring, potentially poorly-documented manuals.
 
 Here are some warmups, however:
 
-For ARM developers: move to (TODO: specify documentation location)
+For ARM developers:
+* Go directly to ARM infocenter (http://infocenter.arm.com/) and you should get
+  ALL the documents.
+* ARM has different ABIs and we use EABI (or GNUEABI, which is the same thing).
+* ARM's ISA has *A LOT OF VERSIONS* and there are optional features. Our
+  processor core is Cortex-A9, which uses ARMv7A.
+* Integer division is one of the optional features, and our core does
+  **NOT** have it implemented.
 
 For MIPS developers:
 * There's an excellent book named *See MIPS Run* which provides an in-depth
   tour to the MIPS architecture, the way MIPS assemblies interact with C
-  programs, and the way Linux works on MIPS.  We didn't include the book
-  in our repository to avoid copyright issues, but you can probably find
-  the electronic version on Internet.
+  programs, and the way Linux works on MIPS.  To avoid copyright issues, we
+  can't include the book in our repository, but you can probably find
+  the electronic version online.
 * Or you can get a first impression in `mips64-loongson3a/prereq.markdown`.

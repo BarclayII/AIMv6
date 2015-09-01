@@ -20,7 +20,6 @@
  * asm/mach-$MACH/config.h)
  */
 #include <config.h>
-#include <drivers/misc/dtb-zynq7000.h>
 
 #ifdef KERNEL
 #define UART_BASE	uart1_base

@@ -24,9 +24,9 @@
 #endif	/* !__ASSEMBLER__ */
 
 #ifndef __ASSEMBLER__
-typedef unsigned char uint8, uchar, byte, __u8, uint8_t;
+typedef unsigned char uint8, uchar, byte, __u8, u8, uint8_t;
 typedef signed char __s8, int8_t;
-typedef unsigned short uint16, ushort, __u16, uint16_t;
+typedef unsigned short uint16, ushort, __u16, u16, uint16_t;
 typedef signed short __s16, int16_t;
 typedef unsigned int uint32, uint, __u32, u32, uint32_t;
 typedef signed int __s32, int32_t;

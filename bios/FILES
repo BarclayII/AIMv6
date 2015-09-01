@@ -1,0 +1,22 @@
+More suggestions are welcome.
+
+bios:
+This is the place for holding all pre-bootloader sources.
+A separate Makefile target is expected for building them.
+
+bios/arch/$(ARCH):
+For architecture-dependent stuff, including arm, mips64, i386 (if any).
+
+bios/arch/$(ARCH)/$(MACH):
+Machine-dependent sources should go there.
+
+bios/include:
+For pre-bootloader architecture-independent headers.
+
+bios/arch/$(ARCH)/include/asm:
+Pre-bootloader architecture-dependent machine-independent headers should
+go there.
+
+bios/arch/$(ARCH)/include/asm/mach-$(MACH):
+Machine-dependent headers should go there.
+

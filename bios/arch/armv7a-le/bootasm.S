@@ -8,13 +8,13 @@
  *
  */
 
-#ifndef _ASM_MACH_CONFIG_H
-#define _ASM_MACH_CONFIG_H
+.globl preload_bootasm
 
-#include <drivers/misc/dtb-zynq7000.h>
+.text
+.arm
 
-#define UART_ZYNQ7000
-#define SD_ZYNQ7000
-
-#endif
+preload_bootasm:
+	ldr	sp, =preload_vector
+	movs	fp, sp
+	bl	preload_bootmain
 
