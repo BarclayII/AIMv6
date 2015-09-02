@@ -33,7 +33,11 @@ u64 gtc_get_time();
  * long enough.
  * value here is 400M, means core run at 800MHz.
  */
-#define GTC_TPS	400000000l
+#define GTC_TPUS 400l
+#define GTC_TPS	(GTC_TPUS * 1000000l)
+/* avoid division whenever possible.
+ * DO NOT LET OPTIMIZATION DECIDE THIS BEHAVIOR!
+ */
 
 /* register offset */
 #define GTC_COUNTER_LO_OFFSET		0x00

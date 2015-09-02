@@ -31,4 +31,24 @@ u64 gtc_get_time()
 	return time;
 }
 
+void sleep(int sec);
+{
+	u64 time, time1;
+	time = gtc_get_time();
+	time += GTC_TPS * sec;
+	do {
+		time1 = gtc_get_time();
+	} while (time1 < time);
+}
+
+void usleep(int usec);
+{
+	u64 time, time1;
+	time = gtc_get_time();
+	time += GTC_TPUS * usec;
+	do {
+		time1 = gtc_get_time();
+	} while (time1 < time);
+}
+
 #endif /* GTC_A9MPCORE */

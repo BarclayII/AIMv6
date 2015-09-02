@@ -36,6 +36,7 @@ PRELOAD_OBJS	=  bios/arch/$(ARCH)/vector.o \
 		   bios/arch/$(ARCH)/bootmain.o \
 		   drivers/serial/uart-zynq7000.o \
 		   drivers/serial/uart.o \
+		   drivers/clock/gtc-a9mpcore.o \
 		   drivers/sd/sd-zynq7000.o
 
 PRELOAD_M4	=  bios/arch/$(ARCH)/preload.m4 \
