@@ -8,11 +8,12 @@
  *
  */
 
+#ifdef SD_ZYNQ7000
+
 #include <config.h>
 #include <sys/types.h>
 #include <asm/io.h>
-
-#ifdef SD_ZYNQ7000
+#include <sleep.h>
 
 #include <drivers/sd/sd-zynq7000.h>
 
@@ -154,6 +155,8 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg)
  */
 int sd_spin_init_card()
 {
+	u32 state;
+	state = in32(SD_BASE + SD_PRES_STATE_OFFSET);
 	
 }
 

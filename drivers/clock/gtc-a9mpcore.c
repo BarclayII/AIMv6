@@ -8,11 +8,11 @@
  *
  */
 
+#ifdef GTC_A9MPCORE
+
 #include <config.h>
 #include <sys/types.h>
 #include <asm/io.h>
-
-#ifdef GTC_A9MPCORE
 
 #include <drivers/clock/gtc-a9mpcore.h>
 
