@@ -24,6 +24,7 @@
 #endif /* KERNEL */
 
 void sd_init();
+int sd_spin_init_mem_card();
 int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg);
 
 /* Register Offset */

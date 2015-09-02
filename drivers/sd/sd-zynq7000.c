@@ -150,18 +150,66 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg)
 }
 
 /*
- * initialize a card
+ * initialize a memory card
+ * card inserted into SD slot can be MMC, SDIO, SD(SC/HC/XC)-(memory/combo).
+ * we want a SD(SC/HC)-memory here. if we see a combo, we ignore the sdio.
  * 0 = good
  * 1 = no card
+ * 2 = error sending CMD0
+ * 3 = error sending CMD8
+ * 4 = CMD8 response bad
+ * 5 = error sending CMD55 & ACMD41
+ * 6 = error sending CMD2
+ * 7 = error sending CMD3
+ * 8 = error sending CMD9
+ * 9 = error sending CMD7
  */
-int sd_spin_init_card()
+int sd_spin_init_mem_card()
 {
-	u32 state;
+	u32 state, resp;
+	int ret;
 	/* check card */
 	state = in32(SD_BASE + SD_PRES_STATE_OFFSET);
 	if (!(state & SD_PSR_CARD_INSRT)) return 1;
 	/* wait. Xilinx does so. Unexplained. */
 	usleep(2000);
+	/* CMD0 */
+	ret = sd_spin_send_cmd(SD_CMD0, 0, 0);
+	if (ret) return 2;
+	/* CMD8 */
+	ret = sd_spin_send_cmd(SD_CMD8, 0, SD_CMD8_VOL_PATTERN);
+	if (ret) return 3;
+	resp = in32(SD_BASE + SD_RESP0_OFFSET);
+	if (resp != SD_CMD8_VOL_PATTERN) return 4;
+	/* CMD55 & ACMD41 */
+	do {
+		ret = sd_spin_send_cmd(SD_CMD55, 0, 0);
+		if (ret) return 5;
+		ret = sd_spin_send_cmd(SD_ACMD41, 0, \
+			(SD_ACMD41_HCS | SD_ACMD41_3V3));
+		if (ret) return 5;
+		resp = in32(SD_BASE + SD_RESP0_OFFSET);
+	} while (!(resp & SD_RESP_READY));
+	/* response0 contains SD(SC)/SDHC/SDXC selection and UHS-1 selection */
+	/* controller support first two types */
+	/* assume S18A(OR) good and go on to CMD2 */
+	ret = sd_spin_send_cmd(SD_CMD2, 0, 0);
+	if (ret) return 6;
+	/* response0-3 contains cardID */
+	/* CMD3 */
+	do {
+		ret = sd_spin_send_cmd(SD_CMD3, 0, 0);
+		if (ret) return 7;
+		resp = in32(SD_BASE + SD_RESP0_OFFSET) & 0xFFFF0000;
+	} while (resp == 0);
+	/* response0(high half) contains card RCA */
+	/* CMD9 */
+	ret = sd_spin_send_cmd(SD_CMD9, 0, resp);
+	if (ret) return 8;
+	/* response0-3 contains cardSpecs */
+	/* CMD7 */
+	ret = sd_spin_send_cmd(SD_CMD7, 0, resp);
+	if (ret) return 9;
 	return 0;
 }
 
