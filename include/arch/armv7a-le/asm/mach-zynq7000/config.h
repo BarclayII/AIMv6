@@ -15,6 +15,7 @@
 
 #define UART_ZYNQ7000
 #define SD_ZYNQ7000
+#define GTC_A9MPCORE
 
 #endif
 

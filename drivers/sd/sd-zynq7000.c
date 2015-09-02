@@ -8,9 +8,10 @@
  *
  */
 
+#include <config.h>
+
 #ifdef SD_ZYNQ7000
 
-#include <config.h>
 #include <sys/types.h>
 #include <asm/io.h>
 #include <sleep.h>
@@ -156,8 +157,12 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg)
 int sd_spin_init_card()
 {
 	u32 state;
+	/* check card */
 	state = in32(SD_BASE + SD_PRES_STATE_OFFSET);
-	
+	if (!(state & SD_PSR_CARD_INSRT)) return 1;
+	/* wait. Xilinx does so. Unexplained. */
+	usleep(2000);
+	return 0;
 }
 
 #endif /* SD_ZYNQ7000 */

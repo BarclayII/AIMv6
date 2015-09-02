@@ -49,7 +49,7 @@ MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootasm.o \
 
 all: preload.bin
 
-$(PRELOAD_OBJS): EXTRA_FLAGS := -O2
+$(PRELOAD_OBJS): EXTRA_FLAGS = -O2
 
 preload.ld: $(PRELOAD_M4)
 	$(M4) bios/arch/$(ARCH)/preload.m4 \
@@ -82,7 +82,7 @@ clean:
 	rm -rf $(MBR_OBJS) mbr mbr.bin mbr.s
 
 .S.o:
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ -c $<
 
 .c.o:
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ -c $<

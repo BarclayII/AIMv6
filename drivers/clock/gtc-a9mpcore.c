@@ -8,9 +8,10 @@
  *
  */
 
+#include <config.h>
+
 #ifdef GTC_A9MPCORE
 
-#include <config.h>
 #include <sys/types.h>
 #include <asm/io.h>
 
@@ -31,7 +32,7 @@ u64 gtc_get_time()
 	return time;
 }
 
-void sleep(int sec);
+void sleep(int sec)
 {
 	u64 time, time1;
 	time = gtc_get_time();
@@ -41,7 +42,7 @@ void sleep(int sec);
 	} while (time1 < time);
 }
 
-void usleep(int usec);
+void usleep(int usec)
 {
 	u64 time, time1;
 	time = gtc_get_time();
