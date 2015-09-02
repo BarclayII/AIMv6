@@ -82,7 +82,7 @@ clean:
 	rm -rf $(MBR_OBJS) mbr mbr.bin mbr.s
 
 .S.o:
-	$(CC) $(CFLAGS) -c -o $*.o $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 .c.o:
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ -c $<
