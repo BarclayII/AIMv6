@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 David Gao <davidgao1001@gmail.com>
+ * Copyright (C) 2015 Gan Quan <coin2028@hotmail.com>
  *
  * This program is free software; you can redistribute  it and/or modify it
  * under  the terms of  the GNU General  Public License as published by the
@@ -8,13 +8,12 @@
  *
  */
 
-#ifndef _ASM_CONFIG_H
-#define _ASM_CONFIG_H
+#ifndef _ASM_SETUP_H
+#define _ASM_SETUP_H
 
-/*
- * Include machine-specific configurations.
- */
-#include <mach/config.h>
+/* CPU pipeline frequency */
+extern unsigned long cpu_freq;
 
-#endif /* _ASM_CONFIG_H */
+void setup_arch(void);
 
+#endif

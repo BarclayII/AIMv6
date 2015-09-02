@@ -8,10 +8,6 @@
  *
  */
 
-/*
- * Here is the place for holding equivalents of x86 primitives.
- */
-
 #ifndef _ASM_IO_H
 #define _ASM_IO_H
 
@@ -21,29 +17,21 @@
 #define iomap(addr)		(IO_BASE + (addr))
 
 /*
- * inx() and outx() for MIPS receives physical address as parameter
+ * in8() and out8() for MIPS receives physical address as parameter
  */
-#define inb(addr)		\
+#define in8(addr)		\
 	(*(volatile uchar *)iomap(addr))
-#define outb(addr, data)	\
+#define out8(addr, data)	\
 	((*(volatile uchar *)iomap(addr)) = (data))
 
-#define inw(addr)		\
+#define in16(addr)		\
 	(*(volatile ushort *)iomap(addr))
-#define outw(addr, data)	\
+#define out16(addr, data)	\
 	((*(volatile ushort *)iomap(addr)) = (data))
 
-#define ind(addr)		\
+#define in32(addr)		\
 	(*(volatile uint *)iomap(addr))
-#define outd(addr, data)	\
+#define out32(addr, data)	\
 	((*(volatile uint *)iomap(addr)) = (data))
-
-#define in8(addr)		inb(addr)
-#define in16(addr)		inw(addr)
-#define in32(addr)		ind(addr)
-
-#define out8(addr, data)	outb(addr, data)
-#define out16(addr, data)	outw(addr, data)
-#define out32(addr, data)	outd(addr, data)
 
 #endif

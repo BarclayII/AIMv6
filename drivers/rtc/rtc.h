@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 David Gao <davidgao1001@gmail.com>
+ * Copyright (C) 2015 Gan Quan <coin2028@hotmail.com>
  *
  * This program is free software; you can redistribute  it and/or modify it
  * under  the terms of  the GNU General  Public License as published by the
@@ -8,13 +8,13 @@
  *
  */
 
-#ifndef _ASM_CONFIG_H
-#define _ASM_CONFIG_H
+#ifndef _DRIVERS_RTC_RTC_H
+#define _DRIVERS_RTC_RTC_H
 
-/*
- * Include machine-specific configurations.
- */
-#include <mach/config.h>
+#include <config.h>
 
-#endif /* _ASM_CONFIG_H */
+#ifdef RTC_MC146818
+#include <drivers/rtc/mc146818.h>
+#endif	/* RTC_MC146818 */
 
+#endif
