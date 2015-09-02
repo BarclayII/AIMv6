@@ -45,6 +45,9 @@ typedef void (*entry_t)();
  * @findsect: function to jump to the specified sector.
  * @read:     read from the file descriptor, similar to read(2)
  * @lseek:    reposition read offset, similar to lseek(2)
+ *
+ * The modified PMON loads MBR (this function, plus the partition entries)
+ * to virtual address 0x80100000.
  */
 
 void __attribute__((noreturn)) _boot(int fd,
