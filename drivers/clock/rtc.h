@@ -8,13 +8,13 @@
  *
  */
 
-#ifndef _DRIVERS_RTC_RTC_H
-#define _DRIVERS_RTC_RTC_H
+#ifndef _DRIVERS_CLOCK_RTC_H
+#define _DRIVERS_CLOCK_RTC_H
 
 #include <config.h>
 
 #ifdef RTC_MC146818
-#include <drivers/rtc/mc146818.h>
+#include <drivers/clock/mc146818.h>
 #endif	/* RTC_MC146818 */
 
 #endif
