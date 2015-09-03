@@ -85,7 +85,7 @@ OBJS		=  kern/arch/$(ARCH)/start.o \
 		   drivers/serial/uart16550.o \
 		   drivers/serial/uart.o \
 		   drivers/serial/uart-printf.o \
-		   drivers/rtc/mc146818.o \
+		   drivers/clock/mc146818.o \
 		   lib/libc/stdio/snprintf.o \
 		   lib/libc/string/memset.o
 

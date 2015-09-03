@@ -35,8 +35,8 @@
  * option) any later version.
  *
  */
-#ifndef _DRIVERS_RTC_MC146818_H
-#define _DRIVERS_RTC_MC146818_H
+#ifndef _DRIVERS_CLOCK_MC146818_H
+#define _DRIVERS_CLOCK_MC146818_H
 
 /*
  *   Register definitions for Dallas Semiconductor DS17285/287 clock chips.

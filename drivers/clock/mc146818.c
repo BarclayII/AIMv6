@@ -19,7 +19,7 @@
 
 #ifdef RTC_MC146818
 
-#include <drivers/rtc/mc146818.h>
+#include <drivers/clock/mc146818.h>
 
 void rtc_init(void)
 {

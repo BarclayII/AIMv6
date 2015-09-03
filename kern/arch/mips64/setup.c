@@ -11,7 +11,7 @@
 #include <config.h>
 #include <asm/setup.h>
 #include <asm/mipsregs.h>
-#include <drivers/rtc/rtc.h>
+#include <drivers/clock/rtc.h>
 #include <drivers/serial/uart.h>
 
 /* CPU pipeline frequency */
