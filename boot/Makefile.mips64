@@ -9,6 +9,10 @@
 
 PREFIX		=  arch/$(ARCH)/$(MACH)/bootsect
 
+INCFLAG		=  -I.. -I../include
+INCFLAG		+= -I../include/arch/$(ARCH)
+INCFLAG		+= -I../include/arch/$(ARCH)/asm/mach-$(MACH)
+
 CFLAGS		=  -Os -G 0 -mno-abicalls -fno-pic -Wall -mabi=32 -fno-builtin
 CFLAGS		+= -nostdinc -nostdlib -mips32r2 -EL $(INCFLAG)
 CFLAGS		+= -DMACH_$(UPPERMACH)

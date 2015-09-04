@@ -26,7 +26,6 @@ ssize_t uart_spin_printf(const char *fmt, ...)
 ssize_t uart_spin_vprintf(const char *fmt, va_list ap)
 {
 	int result;
-	va_list ap;
 	char printf_buf[BUFSIZ];
 	result = vsnprintf(printf_buf, BUFSIZ, fmt, ap);
 	uart_spin_puts(printf_buf);

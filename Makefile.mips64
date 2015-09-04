@@ -64,9 +64,9 @@ OBJDUMP		=  $(CROSS_COMPILE)objdump
 
 # Specify all absolute include path, prepending each with -I (the include
 # directory flag for gcc)
-INCFLAG		=  -I$(ROOTDIR) -I$(ROOTDIR)/include
-INCFLAG		+= -I$(ROOTDIR)/include/arch/$(ARCH)
-INCFLAG		+= -I$(ROOTDIR)/include/arch/$(ARCH)/asm/mach-$(MACH)
+INCFLAG		=  -I. -I./include
+INCFLAG		+= -I./include/arch/$(ARCH)
+INCFLAG		+= -I./include/arch/$(ARCH)/asm/mach-$(MACH)
 
 # Compiling flags for GCC, see gcc(1) for details of each option.
 CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=64 -fno-builtin

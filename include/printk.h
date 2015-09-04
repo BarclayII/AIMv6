@@ -14,6 +14,11 @@
 #include <stdarg.h>
 #include <sys/types.h>
 
+static inline ssize_t vprintk(const char *fmt, va_list ap)
+{
+	return uart_spin_vprintf(fmt, ap);
+}
+
 static inline ssize_t printk(const char *fmt, ...)
 {
 	ssize_t result;
@@ -22,11 +27,6 @@ static inline ssize_t printk(const char *fmt, ...)
 	result = vprintk(fmt, ap);
 	va_end(ap);
 	return result;
-}
-
-static inline ssize_t vprintk(const char *fmt, va_list ap)
-{
-	return uart_spin_vprintf(fmt, ap);
 }
 
 #endif
