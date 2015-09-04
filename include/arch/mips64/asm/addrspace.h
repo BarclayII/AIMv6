@@ -161,9 +161,11 @@
 #define KSSEG		CKSSEG
 #define KSEG3		CKSEG3
 
-#define ASID_KERNEL		0x00	/* Kernel ASID */
-#define ASID_MIN		0x01
-#define ASID_INVALID		0xff	/* Invalid ASID, needs relocation */
-#define ASID_MAX		0xff
+/* Exception handler entry address */
+#define EXCEPT_BASE	0xffffffff80000000	/* Base address */
+#define EXCEPT_TLB	EXCEPT_BASE		/* TLB refill handler */
+#define EXCEPT_TLBX	(EXCEPT_BASE + 0x80)	/* TLB refill handler 64 bit */
+#define EXCEPT_CACHEERR	(EXCEPT_BASE + 0x100)	/* Cache error handler */
+#define EXCEPT_GENERIC	(EXCEPT_BASE + 0x180)	/* Generic handler */
 
 #endif
