@@ -8,7 +8,7 @@
  *
  */
 
-#include <drivers/serial/uart.h>
+#include <printk.h>
 /* 
  * TODO: add setup_arch() for hardware probing/detection/anything funny for
  * each architecture.  The function should be declared in asm/setup.h.
@@ -33,7 +33,7 @@ int main(void)
 	 * 10. Enable swapping & scheduler
 	 * 11. Enter idle stage
 	 */
-	uart_spin_printf("Hello from kernel!\r\n");
+	printk("Hello from kernel!\r\n");
 
 	/* 0. */
 	setup_arch();

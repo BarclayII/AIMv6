@@ -13,6 +13,7 @@
 
 #include <config.h>
 #include <sys/types.h>
+#include <stdarg.h>
 
 #ifdef UART16550
 #include <drivers/serial/uart16550.h>
@@ -22,5 +23,6 @@
 
 void uart_spin_puts(const char *str);
 ssize_t uart_spin_printf(const char *fmt, ...);
+ssize_t uart_spin_vprintf(const char *fmt, va_list ap);
 
 #endif

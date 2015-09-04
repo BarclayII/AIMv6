@@ -9,10 +9,10 @@
  */
 
 #include <config.h>
+#include <printk.h>
 #include <asm/setup.h>
 #include <asm/mipsregs.h>
 #include <drivers/clock/rtc.h>
-#include <drivers/serial/uart.h>
 
 /* CPU pipeline frequency */
 unsigned long cpu_freq;
@@ -47,9 +47,9 @@ void probe_count_freq(void)
 
 void clock_init(void)
 {
-	uart_spin_printf("Initializing Real Time Clock (RTC)...\r\n");
+	printk("Initializing Real Time Clock (RTC)...\r\n");
 	rtc_init();
-	uart_spin_printf(
+	printk(
 	    "Current time: %04d-%02d-%02d %02d:%02d:%02d\r\n",
 	    rtc_getyear(),
 	    rtc_getmonth(),
@@ -59,9 +59,9 @@ void clock_init(void)
 	    rtc_getsecond()
 	);
 
-	uart_spin_printf("Determining CPU frequency...\r\n");
+	printk("Determining CPU frequency...\r\n");
 	probe_count_freq();
-	uart_spin_printf("CPU frequency: %u\r\n", cpu_freq);
+	printk("CPU frequency: %u\r\n", cpu_freq);
 }
 
 void setup_arch(void)

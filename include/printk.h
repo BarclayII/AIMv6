@@ -8,27 +8,25 @@
  *
  */
 
-#include <drivers/serial/uart.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <stddef.h>
+#ifndef _PRINTK_H
+#define _PRINTK_H
 
-ssize_t uart_spin_printf(const char *fmt, ...)
+#include <stdarg.h>
+#include <sys/types.h>
+
+static inline ssize_t printk(const char *fmt, ...)
 {
-	int result;
+	ssize_t result;
 	va_list ap;
 	va_start(ap, fmt);
-	result = uart_spin_vprintf(fmt, ap);
+	result = vprintk(fmt, ap);
 	va_end(ap);
 	return result;
 }
 
-ssize_t uart_spin_vprintf(const char *fmt, va_list ap)
+static inline ssize_t vprintk(const char *fmt, va_list ap)
 {
-	int result;
-	va_list ap;
-	char printf_buf[BUFSIZ];
-	result = vsnprintf(printf_buf, BUFSIZ, fmt, ap);
-	uart_spin_puts(printf_buf);
-	return result;
+	return uart_spin_vprintf(fmt, ap);
 }
+
+#endif
