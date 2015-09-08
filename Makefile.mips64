@@ -68,10 +68,12 @@ INCFLAG		=  -I. -I./include
 INCFLAG		+= -I./include/arch/$(ARCH)
 INCFLAG		+= -I./include/arch/$(ARCH)/asm/mach-$(MACH)
 
+DEFS		=  -DMACH_$(UPPERMACH)
+
 # Compiling flags for GCC, see gcc(1) for details of each option.
 CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=64 -fno-builtin
-CFLAGS		+= -nostdinc -nostdlib -g -mips64r2 -EL $(INCFLAG)
-CFLAGS		+= -DMACH_$(UPPERMACH)
+CFLAGS		+= -nostdinc -nostdlib -ggdb -mips64r2 -gstabs -EL -mno-mips16
+CFLAGS		+= $(INCFLAG) $(DEFS)
 
 # Linker script for ld(1)
 LDSCRIPT	=  kern/arch/$(ARCH)/ldscript.ld
@@ -102,11 +104,11 @@ export
 # line.
 #
 # Makes kernel and bootloader.
-all: elf boot
+all: $(BINARY) boot
 
 # elf: Make kernel by linking the object files and disassembling
 # the binary program after all object files are compiled.
-elf: $(OBJS)
+$(BINARY): $(OBJS)
 	$(LD) $(LDFLAGS) -T $(LDSCRIPT) -o $(BINARY) $(OBJS)
 	$(OBJDUMP) -S $(BINARY) >$(DISASSEMBLY)
 
@@ -134,3 +136,5 @@ clean:
 # the procedure here.
 .S.o:
 	$(CC) $(CFLAGS) -c $< -o $*.o
+
+.PHONY: all boot clean install

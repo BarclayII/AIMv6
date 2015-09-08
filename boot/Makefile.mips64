@@ -27,9 +27,9 @@ BACKMBR		=  $(PREFIX).bak.mbr
 MBR		=  $(PREFIX).mbr
 ZERO		=  /dev/zero
 
-all: binary
+all: $(BINARY)
 
-binary: $(OBJS)
+$(BINARY): $(OBJS)
 	$(LD) $(LDFLAGS) -T $(LDSCRIPT) -o $(ELF) $(OBJS)
 	$(OBJCOPY) -O binary $(ELF) $(BINARY)
 	$(OBJDUMP) -S $(ELF) > $(DISASSEMBLY)
@@ -43,3 +43,5 @@ install: binary
 	dd if=$(BINARY) of=$(MBR) conv=notrunc
 	dd if=$(BACKMBR) of=$(MBR) bs=1 skip=446 seek=446 conv=notrunc
 	$(SUDO) dd if=$(MBR) of=$(INSTALLDEV) bs=512 count=1 conv=notrunc
+
+.PHONY: all clean install

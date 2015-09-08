@@ -39,6 +39,9 @@ typedef unsigned int bool;
 
 typedef unsigned long size_t;
 typedef signed long ssize_t;
+
+typedef void *uintptr_t;
+
 #endif
 
 #endif
