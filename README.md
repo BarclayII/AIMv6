@@ -87,18 +87,20 @@ repository, in the order given:
 [gcc-4.9-mipsel-linux-gnu](https://packages.debian.org/sid/gcc-4.9-mipsel-linux-gnu)  
 
 #### Third-party
-Loongson provided the toolchain for compiling PMON, the MIPS bootloader, [here](http://www.loongnix.com:8000/dev/ftp/toolchain/gcc/release/CROSS_COMPILE/gcc-4.4.0-pmon.tgz).
+Loongson provided the compiler suite for building kernel [here](http://www.loongnix.org/dev/ftp/toolchain/gcc/release/CROSS_COMPILE/loongson3-gcc4.4.tar.gz)
+However, Loongson only supports GCC 4.4.0, which is quite obsolete compared to
+the now-popular version 4.9.x or 5.x.x.
 
-They also provided the compiler suite for building kernel [here](http://www.loongnix.org/dev/ftp/toolchain/gcc/release/CROSS_COMPILE/loongson3-gcc4.4.tar.gz)
+Another good choice is Sourcery Codebench from Mentor Graphics.  The MIPS
+toolchain archive could be downloaded
+[here](sourcery.mentor.com/public/gnu_toolchain/mips-linux-gnu/mips-2015.05-18-mips-linux-gnu-i686-pc-linux-gnu.tar.bz2).
 
-They are different.  The kernel one could not successfully compile PMON.  I
-wonder what they had done to GCC.
-
-`$PATH` and `$LD_LIBRARY_PATH` should be modified accordingly to contain the
-binaries and libraries provided.
+`$PATH` (and `$LD_LIBRARY_PATH` for Loongson's compiler) should be modified
+accordingly to contain the binaries and libraries provided.
+Read `/etc/profile` and put the paths into appropriate files and/or locations.
 
 (TODO: add third-party ARM cross-compiler providers)
 
 #### Build from source
-Refer to `doc/toolchain/build.txt` for details.
 
+(TODO: write source build instructions for ARM/IA32/MIPS)
