@@ -119,26 +119,21 @@ void readstab64(int fd, Elf64_Ehdr *eh64)
 		err(4, "malloc");
 	if (lseek(fd, es64.sh_offset, SEEK_SET) == -1)
 		err(4, "lseek");
-	printf("B%016x\n", es64.sh_offset);
 	if (read(fd, shstrtab, es64.sh_size) == -1)
 		err(4, "read");
 	/* Relocate to the start of section header table */
 	if (lseek(fd, eh64->e_shoff, SEEK_SET) == -1)
 		err(4, "lseek");
-	printf("C\n");
 
 	/* Load the stab string section */
 	for (i = 0; i < eh64->e_shnum; ++i) {
-		printf("D%d\n", i);
 		if (read(fd, &es64, sizeof(es64)) == -1)
 			err(4, "read");
 		if ((cur = lseek(fd, 0, SEEK_CUR)) == -1)
 			err(4, "lseek");
-		printf("%08x %s\n", es64.sh_name, shstrtab + es64.sh_name);
 		if (strcmp(shstrtab + es64.sh_name, STABSTR) == 0) {
 			if ((stabstr = (char *)malloc(es64.sh_size)) == NULL)
 				err(4, "malloc");
-			printf("E\n");
 			if (lseek(fd, es64.sh_offset, SEEK_SET) == -1)
 				err(4, "lseek");
 			if (read(fd, stabstr, es64.sh_size) == -1)
