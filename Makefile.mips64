@@ -84,12 +84,15 @@ LDFLAGS		=  -EL -N
 OBJS		=  kern/arch/$(ARCH)/start.o \
 		   kern/arch/$(ARCH)/setup.o \
 		   kern/init/main.o \
+		   kern/debug/stacktrace.o \
 		   drivers/serial/uart16550.o \
 		   drivers/serial/uart.o \
 		   drivers/serial/uart-printf.o \
 		   drivers/clock/mc146818.o \
 		   lib/libc/stdio/snprintf.o \
 		   lib/libc/string/memset.o
+
+TEST_OBJS	=  kern/debug/stacktrace_test.o
 
 # Final program
 BINARY		=  bootstrap
@@ -108,8 +111,8 @@ all: $(BINARY) boot tools
 
 # elf: Make kernel by linking the object files and disassembling
 # the binary program after all object files are compiled.
-$(BINARY): $(OBJS)
-	$(LD) $(LDFLAGS) -T $(LDSCRIPT) -o $(BINARY) $(OBJS)
+$(BINARY): $(OBJS) $(TEST_OBJS)
+	$(LD) $(LDFLAGS) -T $(LDSCRIPT) -o $(BINARY) $(OBJS) $(TEST_OBJS)
 	$(OBJDUMP) -S $(BINARY) >$(DISASSEMBLY)
 
 # boot: Make bootloader.
@@ -142,4 +145,4 @@ clean:
 .S.o:
 	$(CC) $(CFLAGS) -c $< -o $*.o
 
-.PHONY: all boot tools clean install
+.PHONY: all boot tools clean install test

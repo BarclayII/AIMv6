@@ -8,12 +8,16 @@
  *
  */
 
+#include <stddef.h>
 #include <printk.h>
+#include <debug.h>
 /* 
  * TODO: add setup_arch() for hardware probing/detection/anything funny for
  * each architecture.  The function should be declared in asm/setup.h.
  */
 #include <asm/setup.h>
+
+#include <test.h>
 
 int main(void)
 {
@@ -37,5 +41,7 @@ int main(void)
 
 	/* 0. */
 	setup_arch();
+
+	test_stacktrace();
 }
 

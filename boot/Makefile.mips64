@@ -37,7 +37,7 @@ $(BINARY): $(OBJS)
 clean:
 	rm -f $(OBJS) $(ELF) $(BINARY) $(DISASSEMBLY) $(MBR)
 
-install: binary
+install: $(BINARY)
 	$(SUDO) dd if=$(INSTALLDEV) of=$(BACKMBR) bs=512 count=1
 	dd if=$(ZERO) of=$(MBR) bs=512 count=1
 	dd if=$(BINARY) of=$(MBR) conv=notrunc

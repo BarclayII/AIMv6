@@ -117,6 +117,8 @@ print_uint:			buf_pos = 0;
 				break;
 			case 's':
 				s = va_arg(ap, char *);
+				if (s == NULL)
+					s = "(null)";
 				for (len = 0; *s != '\0'; ++s, ++len)
 					set_ch(*s);
 				for (; len < width; ++len)

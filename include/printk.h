@@ -13,6 +13,7 @@
 
 #include <stdarg.h>
 #include <sys/types.h>
+#include <drivers/serial/uart.h>
 
 static inline ssize_t vprintk(const char *fmt, va_list ap)
 {
