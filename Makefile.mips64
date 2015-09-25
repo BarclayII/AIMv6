@@ -84,7 +84,7 @@ LDFLAGS		=  -EL -N
 OBJS		=  kern/arch/$(ARCH)/start.o \
 		   kern/arch/$(ARCH)/setup.o \
 		   kern/init/main.o \
-		   kern/debug/stacktrace.o \
+		   kern/debug/debug_info.o \
 		   drivers/serial/uart16550.o \
 		   drivers/serial/uart.o \
 		   drivers/serial/uart-printf.o \
@@ -92,7 +92,7 @@ OBJS		=  kern/arch/$(ARCH)/start.o \
 		   lib/libc/stdio/snprintf.o \
 		   lib/libc/string/memset.o
 
-TEST_OBJS	=  kern/debug/stacktrace_test.o
+TEST_OBJS	=  kern/debug/debug_info_test.o
 
 # Final program
 BINARY		=  bootstrap
