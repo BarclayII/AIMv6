@@ -430,4 +430,41 @@ typedef struct elf64_phdr {
 #define PF_MASKOS	0x0ff00000	/* OS-specific */
 #define PF_MASKPROC	0xf0000000	/* Processor-specific */
 
+/* Use these names for portable code */
+#if defined(ELF32)
+#define Elf_Half	Elf32_Half
+#define Elf_Word	Elf32_Word
+#define Elf_Sword	Elf32_Sword
+#define Elf_Xword	Elf32_Xword
+#define Elf_Sxword	Elf32_Sxword
+#define Elf_Addr	Elf32_Addr
+#define Elf_Off		Elf32_Off
+#define Elf_Section	Elf32_Section
+#define Elf_Versym	Elf32_Versym
+#define elfhdr		elf32hdr
+#define elfhdr_t	elf32hdr_t
+#define elf_shdr	elf32_shdr
+#define elf_shdr_t	elf32_shdr_t
+#define elf_phdr	elf32_phdr
+#define elf_phdr_t	elf32_phdr_t
+#elif defined(ELF64)
+#define Elf_Half	Elf64_Half
+#define Elf_Word	Elf64_Word
+#define Elf_Sword	Elf64_Sword
+#define Elf_Xword	Elf64_Xword
+#define Elf_Sxword	Elf64_Sxword
+#define Elf_Addr	Elf64_Addr
+#define Elf_Off		Elf64_Off
+#define Elf_Section	Elf64_Section
+#define Elf_Versym	Elf64_Versym
+#define elfhdr		elf64hdr
+#define elfhdr_t	elf64hdr_t
+#define elf_shdr	elf64_shdr
+#define elf_shdr_t	elf64_shdr_t
+#define elf_phdr	elf64_phdr
+#define elf_phdr_t	elf64_phdr_t
+#else
+#error "Define either ELF32 or ELF64 first"
+#endif
+
 #endif
