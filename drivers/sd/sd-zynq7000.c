@@ -136,10 +136,6 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg, int mode)
 	out16(SD_BASE + SD_ERR_INTR_STS_OFFSET, SD_ERR_INTR_ALL);
 	/* set transfer mode */
 	switch(mode) {
-		/* non-data */
-		case 0:
-			tmp16 = 0;
-			break;
 		/* DMA read */
 		case 1:
 			tmp16 = SD_TM_MUL_SIN_BLK_SEL | SD_TM_DAT_DIR_SEL | \
@@ -150,6 +146,10 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg, int mode)
 		case 2:
 			tmp16 = SD_TM_MUL_SIN_BLK_SEL | SD_TM_AUTO_CMD12_EN | \
 				SD_TM_BLK_CNT_EN | SD_TM_DMA_EN;
+			break;
+		/* non-data */
+		default:
+			tmp16 = 0;
 			break;
 	}
 	out16(SD_BASE + SD_XFER_MODE_OFFSET, tmp16);

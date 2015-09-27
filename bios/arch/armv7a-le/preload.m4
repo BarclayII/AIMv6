@@ -13,24 +13,32 @@ changequote([,])
 sinclude([board.m4])
 sinclude([chip.m4])
 
-preload_size = 1M;
+define([preload_size], [1M])
+[/* preload_size =] preload_size [*/]
+
+MEMORY
+{
+	PRELOAD (rwx) :
+		ORIGIN = ram_size - preload_size,
+		LENGTH = preload_size
+}
 
 SECTIONS
 {
-	. = ORIGIN(RAM) + LENGTH(RAM) - preload_size;
-	.text . : {
+	.preload : {
 		*vector.o(.text)
+	}
+	.text : {
 		*(.text)
 	}
-	.rodata . : {
+	.rodata : {
 		*(.rodata)
 	}
-	.data . : {
+	.data : {
 		*(.data)
 	}
-	.bss . : {
+	.bss : {
 		*(.bss)
-		*(COMMON)
 	}
 }
 
