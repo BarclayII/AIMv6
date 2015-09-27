@@ -99,11 +99,11 @@ u16 sd_frame_cmd(u16 cmd)
 		case SD_CMD3:
 			cmd |= SD_RESP_R6; break;
 		case SD_CMD6:
-			cmd |= SD_RESP_R1B; break;
-			/* for MMC card it is RESP_R1 | SD_DAT_PRESENT_SEL */
-		case SD_CMD8:
 			cmd |= SD_RESP_R1 | SD_DAT_PRESENT; break;
-			/* for MMC card it is RESP_R1 */
+			/* for MMC card it is SD_RESP_R1B */
+		case SD_CMD8:
+			cmd |= SD_RESP_R1; break;
+			/* for MMC card it is SD_RESP_R1 | SD_DAT_PRESENT */
 	}
 	return cmd & 0x3FFF;
 }
@@ -149,7 +149,7 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg, int mode)
 			break;
 		/* non-data */
 		default:
-			tmp16 = 0;
+			tmp16 = SD_TM_DMA_EN;
 			break;
 	}
 	out16(SD_BASE + SD_XFER_MODE_OFFSET, tmp16);
@@ -182,6 +182,7 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg, int mode)
  * -8 = error sending CMD9
  * -9 = error sending CMD7
  */
+
 int sd_spin_init_mem_card()
 {
 	u32 state, resp;
@@ -189,7 +190,7 @@ int sd_spin_init_mem_card()
 	/* check card */
 	state = in32(SD_BASE + SD_PRES_STATE_OFFSET);
 	if (!(state & SD_PSR_CARD_INSRT)) return -1;
-	/* wait. Xilinx does so. Unexplained. */
+	/* wait 74 clocks (of sd controller). */
 	usleep(2000);
 	/* CMD0 */
 	ret = sd_spin_send_cmd(SD_CMD0, 0, 0, 0);
@@ -220,8 +221,8 @@ int sd_spin_init_mem_card()
 		if (ret) return -7;
 		resp = in32(SD_BASE + SD_RESP0_OFFSET) & 0xFFFF0000;
 	} while (resp == 0);
-	/* response0(high half) contains card RCA */
-	/* CMD9 */
+	/* response0(high 16bit) contains card RCA */
+	/* CMD9 for specs, we don't use this now */
 	ret = sd_spin_send_cmd(SD_CMD9, 0, resp, 0);
 	if (ret) return -8;
 	/* response0-3 contains cardSpecs */
@@ -256,10 +257,11 @@ int sd_spin_init_mem_card()
 int sd_dma_spin_read(u32 pa, u16 count, u32 offset)
 {
 	int ret;
-	u16 state;
+	u16 state16;
+	u32 state32;
 	/* check card */
-	state = in32(SD_BASE + SD_PRES_STATE_OFFSET);
-	if (!(state & SD_PSR_CARD_INSRT)) return -1;
+	state32 = in32(SD_BASE + SD_PRES_STATE_OFFSET);
+	if (!(state32 & SD_PSR_CARD_INSRT)) return -1;
 	/* block size set to 512 during controller init, skipping check */
 	/* write address */
 	out32(SD_BASE + SD_SDMA_SYS_ADDR_OFFSET, pa);
@@ -268,13 +270,13 @@ int sd_dma_spin_read(u32 pa, u16 count, u32 offset)
 	if (ret) return -2;
 	/* wait for transfer complete */
 	do {
-		state = in16(SD_BASE + SD_NORM_INTR_STS_OFFSET);
-		if (state & SD_INTR_ERR) {
+		state16 = in16(SD_BASE + SD_NORM_INTR_STS_OFFSET);
+		if (state16 & SD_INTR_ERR) {
 			out16(SD_BASE + SD_ERR_INTR_STS_OFFSET, \
 				SD_ERR_INTR_ALL);
 			return -3;
 		}
-	} while (!(state & SD_INTR_TC));
+	} while (!(state16 & SD_INTR_TC));
 	/* clean up */
 	out16(SD_BASE + SD_NORM_INTR_STS_OFFSET, SD_INTR_TC);
 	return 0;
@@ -305,10 +307,11 @@ int sd_dma_spin_read(u32 pa, u16 count, u32 offset)
 int sd_dma_spin_write(u32 pa, u16 count, u32 offset)
 {
 	int ret;
-	u16 state;
+	u16 state16;
+	u32 state32;
 	/* check card */
-	state = in32(SD_BASE + SD_PRES_STATE_OFFSET);
-	if (!(state & SD_PSR_CARD_INSRT)) return -1;
+	state32 = in32(SD_BASE + SD_PRES_STATE_OFFSET);
+	if (!(state32 & SD_PSR_CARD_INSRT)) return -1;
 	/* block size set to 512 during controller init, skipping check */
 	/* write address */
 	out32(SD_BASE + SD_SDMA_SYS_ADDR_OFFSET, pa);
@@ -317,13 +320,13 @@ int sd_dma_spin_write(u32 pa, u16 count, u32 offset)
 	if (ret) return -2;
 	/* wait for transfer complete */
 	do {
-		state = in16(SD_BASE + SD_NORM_INTR_STS_OFFSET);
-		if (state & SD_INTR_ERR) {
+		state16 = in16(SD_BASE + SD_NORM_INTR_STS_OFFSET);
+		if (state16 & SD_INTR_ERR) {
 			out16(SD_BASE + SD_ERR_INTR_STS_OFFSET, \
 				SD_ERR_INTR_ALL);
 			return -3;
 		}
-	} while (!(state & SD_INTR_TC));
+	} while (!(state16 & SD_INTR_TC));
 	/* clean up */
 	out16(SD_BASE + SD_NORM_INTR_STS_OFFSET, SD_INTR_TC);
 	return 0;
