@@ -46,8 +46,9 @@ void firmware_bootmain(void)
 	/* Initialize SD card */
 	ret = sd_spin_init_mem_card();
 	if (ret == 0) uart_spin_puts("FW: SD Card initialized.\r\n");
+	else if (ret == 1) uart_spin_puts("FW: SDHC Card initialized.\r\n");
 	else {
-		uart_spin_puts("FW: SD Card initialization failed.\r\n");
+		uart_spin_puts("FW: Card initialization failed.\r\n");
 		goto spin;
 	}
 
@@ -60,9 +61,9 @@ void firmware_bootmain(void)
 
 	/* Read MBR */
 	ret = sd_dma_spin_read((u32)mbr, 1, 0);
-	if (ret == 0) uart_spin_puts("FW: SD Card read OK.\r\n");
+	if (ret == 0) uart_spin_puts("FW: Card read OK.\r\n");
 	else {
-		uart_spin_puts("FW: SD Card read failed.\r\n");
+		uart_spin_puts("FW: Card read failed.\r\n");
 		goto spin;
 	}
 	

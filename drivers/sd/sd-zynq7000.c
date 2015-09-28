@@ -186,7 +186,7 @@ int sd_spin_send_cmd(u16 cmd, u16 count, u32 arg, int mode)
 int sd_spin_init_mem_card()
 {
 	u32 state, resp;
-	int ret;
+	int ret, cardtype;
 	/* check card */
 	state = in32(SD_BASE + SD_PRES_STATE_OFFSET);
 	if (!(state & SD_PSR_CARD_INSRT)) return -1;
@@ -210,7 +210,8 @@ int sd_spin_init_mem_card()
 		resp = in32(SD_BASE + SD_RESP0_OFFSET);
 	} while (!(resp & SD_RESP_READY));
 	/* SD or SDHC? */
-	
+	if (resp & SD_ACMD41_HCS) cardtype = 1; /* SDHC */
+	else cardtype = 0; /* SD(SC) */
 	/* assume S18A(OR) good and go on to CMD2 */
 	ret = sd_spin_send_cmd(SD_CMD2, 0, 0, 0);
 	if (ret) return -6;
@@ -229,7 +230,7 @@ int sd_spin_init_mem_card()
 	/* CMD7 */
 	ret = sd_spin_send_cmd(SD_CMD7, 0, resp, 0);
 	if (ret) return -9;
-	return 0;
+	return cardtype;
 }
 
 /*
