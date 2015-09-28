@@ -32,17 +32,17 @@ CFLAGS		+= -mlittle-endian $(INCFLAG) -DMACH_$(UPPERMACH)
 
 LDFLAGS		=  -EL -O -N
 
-PRELOAD_OBJS	=  bios/arch/$(ARCH)/vector.o \
-		   bios/arch/$(ARCH)/bootasm.o \
-		   bios/arch/$(ARCH)/bootmain.o \
+PRELOAD_OBJS	=  firmware/arch/$(ARCH)/vector.o \
+		   firmware/arch/$(ARCH)/bootasm.o \
+		   firmware/arch/$(ARCH)/bootmain.o \
 		   drivers/serial/uart-zynq7000.o \
 		   drivers/serial/uart.o \
 		   drivers/clock/gtc-a9mpcore.o \
 		   drivers/sd/sd-zynq7000.o
 
-PRELOAD_M4	=  bios/arch/$(ARCH)/preload.m4 \
-		   bios/arch/$(ARCH)/$(MACH)/chip.m4 \
-		   bios/arch/$(ARCH)/$(MACH)/$(BOARD)/board.m4
+PRELOAD_M4	=  firmware/arch/$(ARCH)/preload.m4 \
+		   firmware/arch/$(ARCH)/$(MACH)/chip.m4 \
+		   firmware/arch/$(ARCH)/$(MACH)/$(BOARD)/board.m4
 
 MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootasm.o \
 		   boot/arch/$(ARCH)/$(MACH)/bootmain.o
@@ -52,9 +52,9 @@ all: preload.bin
 $(PRELOAD_OBJS): EXTRA_CFLAGS = -O2
 
 preload.ld: $(PRELOAD_M4)
-	$(M4) bios/arch/$(ARCH)/preload.m4 \
-	-I bios/arch/$(ARCH)/$(MACH)/ \
-	-I bios/arch/$(ARCH)/$(MACH)/$(BOARD)/ > $@
+	$(M4) firmware/arch/$(ARCH)/preload.m4 \
+	-I firmware/arch/$(ARCH)/$(MACH)/ \
+	-I firmware/arch/$(ARCH)/$(MACH)/$(BOARD)/ > $@
 
 preload: $(PRELOAD_OBJS) preload.ld
 	$(LD) $(LDFLAGS) -T preload.ld -j PRELOAD -o $@ $(PRELOAD_OBJS)
