@@ -8,13 +8,13 @@
  *
  */
 
-.globl preload_vector
+.globl firmware_vector
 
 .text
 .arm
 
-preload_vector:
-	b	preload_bootasm
+firmware_vector:
+	b	firmware_bootasm
 	b	uart_init
 	b	uart_enable
 	b	uart_spin_puts

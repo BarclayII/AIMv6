@@ -8,10 +8,9 @@
  *
  */
 
+#include <sleep.h>
 #include <drivers/serial/uart.h>
 #include <drivers/sd/sd-zynq7000.h>
-#include <sleep.h>
-#include <asm/io.h>
 
 void puthex(u32 num)
 {
@@ -24,7 +23,7 @@ void puthex(u32 num)
     uart_spin_puts(buf);
 }
 
-void preload_bootmain(void)
+void firmware_bootmain(void)
 {
 	int ret;
 	sleep(1);

@@ -18,7 +18,7 @@ define([preload_size], [1M])
 
 MEMORY
 {
-	PRELOAD (rwx) :
+	FIRMWARE (rwx) :
 		ORIGIN = ram_size - preload_size,
 		LENGTH = preload_size
 }

@@ -8,13 +8,13 @@
  *
  */
 
-.globl preload_bootasm
+.globl firmware_bootasm
 
 .text
 .arm
 
-preload_bootasm:
-	ldr	sp, =preload_vector
+firmware_bootasm:
+	ldr	sp, =firmware_vector
 	movs	fp, sp
-	bl	preload_bootmain
+	bl	firmware_bootmain
 
