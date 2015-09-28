@@ -42,4 +42,4 @@ SECTIONS
 	}
 }
 
-ENTRY(preload_vector)
+ENTRY(firmware_vector)
