@@ -15,7 +15,7 @@ INCFLAG		+= -I../include/arch/$(ARCH)/asm/mach-$(MACH)
 
 CFLAGS		=  -Os -G 0 -mno-abicalls -fno-pic -Wall -mabi=32 -fno-builtin
 CFLAGS		+= -nostdinc -nostdlib -mips32r2 -EL $(INCFLAG)
-CFLAGS		+= -DMACH_$(UPPERMACH)
+CFLAGS		+= -DMACH_$(UPPERMACH) -DELF64
 
 OBJS		=  $(PREFIX).o
 LDSCRIPT	=  $(PREFIX).ld

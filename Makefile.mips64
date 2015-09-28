@@ -68,7 +68,7 @@ INCFLAG		=  -I. -I./include
 INCFLAG		+= -I./include/arch/$(ARCH)
 INCFLAG		+= -I./include/arch/$(ARCH)/asm/mach-$(MACH)
 
-DEFS		=  -DMACH_$(UPPERMACH)
+DEFS		=  -DMACH_$(UPPERMACH) -DELF64
 
 # Compiling flags for GCC, see gcc(1) for details of each option.
 CFLAGS		=  -O2 -G 0 -mno-abicalls -fno-pic -Wall -mabi=64 -fno-builtin
