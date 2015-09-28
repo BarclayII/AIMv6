@@ -9,10 +9,11 @@
  */
 
 #include <config.h>
-#include <sys/types.h>
-#include <asm/io.h>
 
 #ifdef GTC_A9MPCORE
+
+#include <sys/types.h>
+#include <asm/io.h>
 
 #include <drivers/clock/gtc-a9mpcore.h>
 
@@ -29,6 +30,26 @@ u64 gtc_get_time()
 	time = (u64)hi << 32;
 	time |= lo;
 	return time;
+}
+
+void sleep(int sec)
+{
+	u64 time, time1;
+	time = gtc_get_time();
+	time += GTC_TPS * sec;
+	do {
+		time1 = gtc_get_time();
+	} while (time1 < time);
+}
+
+void usleep(int usec)
+{
+	u64 time, time1;
+	time = gtc_get_time();
+	time += GTC_TPUS * usec;
+	do {
+		time1 = gtc_get_time();
+	} while (time1 < time);
 }
 
 #endif /* GTC_A9MPCORE */

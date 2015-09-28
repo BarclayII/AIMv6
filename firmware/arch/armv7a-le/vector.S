@@ -8,16 +8,13 @@
  *
  */
 
-#include <drivers/serial/uart.h>
-#include <drivers/sd/sd-zynq7000.h>
+.globl firmware_vector
 
-void preload_bootmain(void)
-{
-	uart_init();
-	uart_enable();
-	uart_spin_puts("Preload: Hello!\r\n");
-	sd_init();
-	uart_spin_puts("Preload: SD Controller initialized.\r\n");
-	while (1);
-}
+.text
+.arm
 
+firmware_vector:
+	b	firmware_bootasm
+	b	uart_init
+	b	uart_enable
+	b	uart_spin_puts

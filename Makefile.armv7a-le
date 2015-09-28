@@ -32,39 +32,40 @@ CFLAGS		+= -mlittle-endian $(INCFLAG) -DMACH_$(UPPERMACH)
 
 LDFLAGS		=  -EL -O -N
 
-PRELOAD_OBJS	=  bios/arch/$(ARCH)/vector.o \
-		   bios/arch/$(ARCH)/bootasm.o \
-		   bios/arch/$(ARCH)/bootmain.o \
+FIRMWARE_OBJS	=  firmware/arch/$(ARCH)/vector.o \
+		   firmware/arch/$(ARCH)/bootasm.o \
+		   firmware/arch/$(ARCH)/bootmain.o \
 		   drivers/serial/uart-zynq7000.o \
 		   drivers/serial/uart.o \
+		   drivers/clock/gtc-a9mpcore.o \
 		   drivers/sd/sd-zynq7000.o
 
-PRELOAD_M4	=  bios/arch/$(ARCH)/preload.m4 \
-		   bios/arch/$(ARCH)/$(MACH)/chip.m4 \
-		   bios/arch/$(ARCH)/$(MACH)/$(BOARD)/board.m4
+FIRMWARE_M4	=  firmware/arch/$(ARCH)/firmware.m4 \
+		   firmware/arch/$(ARCH)/$(MACH)/chip.m4 \
+		   firmware/arch/$(ARCH)/$(MACH)/$(BOARD)/board.m4
 
 MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootasm.o \
 		   boot/arch/$(ARCH)/$(MACH)/bootmain.o
 
-all: preload.bin
+all: firmware.bin
 
-$(PRELOAD_OBJS): EXTRA_FLAGS := -O2
+$(FIRMWARE_OBJS): EXTRA_CFLAGS = -O2
 
-preload.ld: $(PRELOAD_M4)
-	$(M4) bios/arch/$(ARCH)/preload.m4 \
-	-I bios/arch/$(ARCH)/$(MACH)/ \
-	-I bios/arch/$(ARCH)/$(MACH)/$(BOARD)/ > $@
+firmware.ld: $(FIRMWARE_M4)
+	$(M4) firmware/arch/$(ARCH)/firmware.m4 \
+	-I firmware/arch/$(ARCH)/$(MACH)/ \
+	-I firmware/arch/$(ARCH)/$(MACH)/$(BOARD)/ > $@
 
-preload: $(PRELOAD_OBJS) preload.ld
-	$(LD) $(LDFLAGS) -T preload.ld -o $@ $(PRELOAD_OBJS)
+firmware.elf: $(FIRMWARE_OBJS) firmware.ld
+	$(LD) $(LDFLAGS) -T firmware.ld -j FIRMWARE -o $@ $(FIRMWARE_OBJS)
 
-preload.bin: preload
+firmware.bin: firmware.elf
 	$(OBJCOPY) -O binary -S $^ $@
 
-preload.s: preload
+firmware.s: firmware.elf
 	$(OBJDUMP) -S $^ > $@
 
-$(MBR_OBJS): EXTRA_FLAGS := -Os
+$(MBR_OBJS): EXTRA_CFLAGS := -Os
 
 mbr: $(MBR_OBJS)
 	$(LD) $(LDFLAGS) -T boot/arch/$(ARCH)/$(MACH)/mbr.ld -o $@ $^
@@ -76,12 +77,12 @@ mbr.bin: mbr
 	$(OBJCOPY) -O binary -S $^ $@
 
 clean:
-	rm -f preload.ld
-	rm -rf $(PRELOAD_OBJS) preload preload.bin preload.s
+	rm -f firmware.ld
+	rm -rf $(FIRMWARE_OBJS) firmware.elf firmware.bin firmware.s
 	rm -rf $(MBR_OBJS) mbr mbr.bin mbr.s
 
 .S.o:
-	$(CC) $(CFLAGS) -c -o $*.o $<
+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ -c $<
 
 .c.o:
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ -c $<

@@ -8,13 +8,16 @@
  *
  */
 
-.globl preload_vector
+#ifndef _SLEEP_H
+#define _SLEEP_H
 
-.text
-.arm
+/*
+ * These functions should be provided by some clock or timer.
+ * But their usage should have no difference.
+ * We simply define them here. You'll get a link-time error if
+ * you use one but don't have one.
+ */
+void sleep(int sec);
+void usleep(int usec);
 
-preload_vector:
-	b	preload_bootasm
-	b	uart_init
-	b	uart_enable
-	b	uart_spin_puts
+#endif /* _SLEEP_H */

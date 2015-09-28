@@ -9,9 +9,10 @@
  */
 
 #include <config.h>
-#include <asm/io.h>
 
 #ifdef UART_ZYNQ7000
+
+#include <asm/io.h>
 
 #include <drivers/serial/uart-zynq7000.h>
 

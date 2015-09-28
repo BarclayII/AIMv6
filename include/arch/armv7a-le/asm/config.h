@@ -14,7 +14,9 @@
 /*
  * Include machine-specific configurations.
  */
-#include <mach/config.h>
+#ifdef MACH_ZYNQ7000
+#include <asm/mach-zynq7000/config.h>
+#endif /* MACH_ZYNQ7000 */
 
 #endif /* _ASM_CONFIG_H */
 
