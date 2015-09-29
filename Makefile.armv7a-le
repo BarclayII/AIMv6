@@ -57,7 +57,7 @@ firmware.ld: $(FIRMWARE_M4)
 	-I firmware/arch/$(ARCH)/$(MACH)/$(BOARD)/ > $@
 
 firmware.elf: $(FIRMWARE_OBJS) firmware.ld
-	$(LD) $(LDFLAGS) -T firmware.ld -j FIRMWARE -o $@ $(FIRMWARE_OBJS)
+	$(LD) $(LDFLAGS) -T firmware.ld -o $@ $(FIRMWARE_OBJS)
 
 firmware.bin: firmware.elf
 	$(OBJCOPY) -O binary -S $^ $@
