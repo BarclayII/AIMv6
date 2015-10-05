@@ -1,14 +1,21 @@
-ENTRY(bootasm)
+ENTRY(mbr_bootmain)
+
+MEMORY
+{
+	MBR (rwx) :
+		ORIGIN = 1M,
+		LENGTH = 512
+}
 
 SECTIONS
 {
-	. = 0x1000;
 	.text : {
-		*bootasm.o(.text .rodata)
 		*(.text .rodata)
 	}
 	.data : {
 		*(.data)
 	}
-	PROVIDE(bootstack = 0x10000);
+	.bss : {
+		*(.bss)
+	}
 }

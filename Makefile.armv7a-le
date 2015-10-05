@@ -44,10 +44,9 @@ FIRMWARE_M4	=  firmware/arch/$(ARCH)/firmware.m4 \
 		   firmware/arch/$(ARCH)/$(MACH)/chip.m4 \
 		   firmware/arch/$(ARCH)/$(MACH)/$(BOARD)/board.m4
 
-MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootasm.o \
-		   boot/arch/$(ARCH)/$(MACH)/bootmain.o
+MBR_OBJS	=  boot/arch/$(ARCH)/$(MACH)/bootmain.o
 
-all: firmware.bin
+all: firmware.bin mbr.bin
 
 $(FIRMWARE_OBJS): EXTRA_CFLAGS = -O2
 
@@ -59,32 +58,26 @@ firmware.ld: $(FIRMWARE_M4)
 firmware.elf: $(FIRMWARE_OBJS) firmware.ld
 	$(LD) $(LDFLAGS) -T firmware.ld -o $@ $(FIRMWARE_OBJS)
 
-firmware.bin: firmware.elf
-	$(OBJCOPY) -O binary -S $^ $@
-
-firmware.s: firmware.elf
-	$(OBJDUMP) -S $^ > $@
-
 $(MBR_OBJS): EXTRA_CFLAGS := -Os
 
-mbr: $(MBR_OBJS)
+mbr.elf: $(MBR_OBJS) boot/arch/$(ARCH)/$(MACH)/mbr.ld
 	$(LD) $(LDFLAGS) -T boot/arch/$(ARCH)/$(MACH)/mbr.ld -o $@ $^
-
-mbr.s: mbr
-	$(OBJDUMP) -S $^ > $@
-
-mbr.bin: mbr
-	$(OBJCOPY) -O binary -S $^ $@
 
 clean:
 	rm -f firmware.ld
 	rm -rf $(FIRMWARE_OBJS) firmware.elf firmware.bin firmware.s
-	rm -rf $(MBR_OBJS) mbr mbr.bin mbr.s
+	rm -rf $(MBR_OBJS) mbr.elf mbr.bin mbr.s
 
 .S.o:
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ -c $<
 
 .c.o:
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -o $@ -c $<
+
+%.s: %.elf
+	$(OBJDUMP) -S $^ > $@
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary -S $^ $@
 
 .PHONY: clean
