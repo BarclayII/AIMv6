@@ -70,7 +70,7 @@ void firmware_bootmain(void)
 	/* Check MBR */
 	if (mbr[510] == 0x55 && mbr[511] == 0xAA) {
 		uart_spin_puts("FW: MBR valid.\r\n");
-		//mbr_entry();
+		mbr_entry();
 	} else uart_spin_puts("FW: MBR not valid.\r\n");
 	
 spin:
