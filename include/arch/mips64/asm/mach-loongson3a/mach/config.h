@@ -27,6 +27,7 @@
 
 /* Loongson 3A increases COUNT register by one every 2 cycles */
 #define COUNT_TO_FREQ(count)	((count) * 2)
+#define FREQ_TO_COUNT(freq)	((freq) / 2)
 
 #define NR_CPUS		4		/* 4 cores */
 

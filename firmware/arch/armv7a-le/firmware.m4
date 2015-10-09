@@ -25,7 +25,7 @@ MEMORY
 
 SECTIONS
 {
-	.preload : {
+	.vector : {
 		*vector.o(.text)
 	}
 	.text : {
