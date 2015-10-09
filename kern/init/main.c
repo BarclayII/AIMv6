@@ -8,16 +8,18 @@
  *
  */
 
+#include <config.h>
 #include <stddef.h>
 #include <printk.h>
 #include <debug.h>
+#include <smp.h>
 /* 
  * TODO: add setup_arch() for hardware probing/detection/anything funny for
  * each architecture.  The function should be declared in asm/setup.h.
  */
 #include <asm/setup.h>
 
-#include <test.h>
+union cpu_info_stack cpu_info_stack[NR_CPUS];
 
 int main(void)
 {
@@ -41,7 +43,5 @@ int main(void)
 
 	/* 0. */
 	setup_arch();
-
-	test_stacktrace();
 }
 
