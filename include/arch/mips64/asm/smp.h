@@ -11,6 +11,8 @@
 #ifndef _ASM_SMP_H
 #define _ASM_SMP_H
 
+#ifndef __ASSEMBLER__
+
 #include <asm/mipsregs.h>
 
 #ifndef cpuid
@@ -22,5 +24,7 @@ inline unsigned int __cpuid(void)
 
 #define cpuid()		__cpuid()
 #endif	/* !defined(cpuid) */
+
+#endif	/* !__ASSEMBLER__ */
 
 #endif

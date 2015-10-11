@@ -83,38 +83,13 @@ void setup_arch(void)
 	clock_init();
 
 	uint32_t addr;
-	
-	printk("Routing to CORE0 INT1\r\n");
-	for (addr = 0x3ff01418; addr <= 0x3ff0141f; ++addr) {
-		out8(addr, 0x21);
-	}
-
-	uint64_t htaddr = 0x0efdfb000000;
 	uint64_t addr64;
-
-	printk("Enabling interrupt\r\n");
-	out32(htaddr + 0xa0, 0xffff);
-
-	for (addr64 = htaddr + 0xa4; addr64 < htaddr + 0xc0; addr64 += 4) {
-		out32(addr64, 0);
-	}
-
-	printk("Enabling IO interrupt\r\n");
-	out32(0x3ff01424, 0xffff0000);
-
-	printk("INTMAP:\r\n");
-	for (addr = 0x3ff01400; addr <= 0x3ff0141f; ++addr) {
-		printk("%02x%s", in8(addr), addr % 8 == 7 ? "\r\n" : " ");
-	}
-	printk("INTISR: %08x\r\n", in32(0x3ff01420));
 
 	addr = 0x1a000000 | (0x11 << 11) | (0x24);
 	uint32_t bar5 = in32(addr);
 	printk("SATA BAR5 = %08x\r\n", bar5);
 	printk("SATA CAP = %08x\r\n", in32(bar5));
 	printk("SATA GHC = %08x\r\n", in32(bar5 + 4));
-	printk("INTRLINE = %02x\r\n", in8(0x1a000000 | (0x11 << 11) | 0x3c));
-	printk("INTRPIN  = %02x\r\n", in8(0x1a000000 | (0x11 << 11) | 0x3d));
 
 	for (i = 0; i < 4; ++i) {
 		addr = 0x1a000000 | (0x11 << 11) | (0x10 + 4 * i);
@@ -132,7 +107,45 @@ void setup_arch(void)
 		}
 	}
 
+	printk("Setting up HT interrupts\r\n");
+
+#define IO_REGS_BASE	0x3ff00000
+	for (addr = 0x3ff01418; addr <= 0x3ff0141f; ++addr)
+		out8(addr, 0x21);
+
+	/*
+	for (addr64 = 0xefdfb0000a0; addr64 <= 0xefdfb0000bc; addr64 += 4)
+		out32(addr, 0xffffffff);
+	*/
+	out32(0xefdfb0000a0, 0xffffffff);
+	uint32_t inten = in32(0x3ff01424);
+	out32(0x3ff01428, inten | (0xffff << 16) | (1 << 10));
+
+	printk("Setting up i8259A\r\n");
+	/* i8259A, see picinit() in xv6 */
+	out8(0xefdfc000021, 0xff);		/* PIC_MASTER_IMR */
+	out8(0xefdfc0000a1, 0xff);		/* PIC_SLAVE_IMR */
+	out8(0xefdfc000020, 0x11);		/* PIC_MASTER_CMD */
+	out8(0xefdfc000021, 32);		/* T_IRQ0 */
+	out8(0xefdfc000021, 1 << 2);		/* PIC_CASCADE_IR */
+	out8(0xefdfc000021, 0x1);		/* Normal EOI as Linux/MIPS */
+	out8(0xefdfc0000a0, 0x11);		/* PIC_SLAVE_CMD */
+	out8(0xefdfc0000a1, 40);		/* T_IRQ0 + 8 */
+	out8(0xefdfc0000a1, 2);
+	out8(0xefdfc0000a1, 0x1);		/* ditto */
+	/* not doing these as in Linux/MIPS */
+	/*
+	out8(0xefdfc000020, 0x68);
+	out8(0xefdfc000020, 0x0a);
+	out8(0xefdfc0000a0, 0x68);
+	out8(0xefdfc0000a0, 0x0a);
+	*/
+	out8(0xefdfc000021, 0xff);
+	out8(0xefdfc0000a1, 0xff);
+
 	/* Identify device */
+	uint32_t cause = read_c0_cause();
+	printk("CAUSE BEFORE: %08x\r\n", cause);
 	addr = 0x1a000000 | (0x11 << 11) | (0x10 + 4 * port);
 	bar = in32(addr) | 0x18000000;
 	bar &= ~0x7;
@@ -143,13 +156,9 @@ void setup_arch(void)
 	out8(bar + 0x6, 0xe0 + (slave << 4));
 	out8(bar_ctrl + 0x2, 0x0);	/* Interrupt */
 	out8(bar + 0x7, 0xec);
-	uint32_t isr;
-	uint32_t cause = read_c0_cause();
-	printk("CAUSE before: %08x\r\n", cause);
-	while ((isr = in32(0x3ff01420)) == 0 && read_c0_cause() == cause)
+	while (cause == read_c0_cause())
 		/* nothing */;
-	printk("CAUSE after: %08x\r\n", read_c0_cause());
-	printk("INTISR: %08x\r\n", isr);
+	printk("CAUSE AFTER: %08x\r\n", read_c0_cause());
 	if ((stat = in8(bar + 0x7)) & 0x01) {
 		printk("ERROR?\r\n");
 		return;
