@@ -1,8 +1,8 @@
-# Exercise 2 HOWTO - A Step-By-Step Walkthrough from Scratch
+# Lab 1 HOWTO - A Step-By-Step Walkthrough from Scratch
 
 ## Overview
 
-First, let's review the tasks of exercise 2:
+There are three tasks in Lab 1:
 
 1. **Design and implement a firmware on MSIM to load and execute the code from
 MBR**.
@@ -16,6 +16,63 @@ The requirement is *to design a scalable, extensible framework for kernel to
 allow convenient support for heterogeneous platform, hardware, and/or
 architecture*.  This is really a software engineering problem existing in
 all software projects.
+
+### Environment Prerequisites
+
+1. MIPS toolchain.
+    - Grab one from Sourcery Codebench Lite if you don't have one in official
+      repository.
+2. MSIM simulator.
+
+This lab *does not require Linux*, you can do experiments under Cygwin or MinGW
+on Windows, as long as you have a working toolchain under Cygwin (which is
+supported by Sourcery Codebench Lite, consult the installation instructions
+for details).  MSIM simulator is runnable under Cygwin and MinGW.
+
+A Linux is always preferred, though.
+
+### Knowledge Prerequisites
+
+This lab assumes that you have basic knowledge of MIPS assembly (you could
+get familiar with it in Lab 0), and basic C programming.
+
+Also, it assumes that you're familiar with using `man(1)`, and sometimes
+`info(1)`.
+
+- Make sure you have installed POSIX man pages if you're using Cygwin.
+
+This lab will teach you from writing assembly, C code, to writing Makefiles,
+linker scripts, up to framework designs.
+
+### Shipped files
+
+Make sure you have the following files:
+
+- `headers` directory
+    + `addrspace.h`
+    + `asm.h`
+    + `cp0regdef.h`
+    + `elf.h`
+    + `io.h`
+    + `irq.h`
+    + `mipsregs.h`
+    + `regdef.h`
+    + `stdarg.h`
+    + `stddef.h`
+    + `stdio.h`
+    + `string.h`
+    + `sys/types.h`
+- `src` directory
+    + `memcpy.c`
+    + `memset.c`
+    + `snprintf.c`
+
+Note that we'll (almost surely) move the headers and sources to elsewhere.
+
+### Examples and exercises
+
+This document contains different examples along with step-by-step exercises.
+It's highly recommended to stick to the exercises to complete the lab.
 
 ## What firmware should do
 
