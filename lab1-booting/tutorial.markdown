@@ -1,8 +1,8 @@
-# MIPS group Lab 1 HOWTO - A Step-By-Step Walkthrough from Scratch
+# Exercise 2 HOWTO - A Step-By-Step Walkthrough from Scratch
 
 ## Overview
 
-MIPS group Lab 1 has three tasks:
+First, let's review the tasks of exercise 2:
 
 1. **Design and implement a firmware on MSIM to load and execute the code from
 MBR**.
@@ -16,63 +16,6 @@ The requirement is *to design a scalable, extensible framework for kernel to
 allow convenient support for heterogeneous platform, hardware, and/or
 architecture*.  This is really a software engineering problem existing in
 all software projects.
-
-### Environment Prerequisites
-
-1. MIPS toolchain.
-    - Grab one from Sourcery Codebench Lite if you don't have one in official
-      repository.
-2. MSIM simulator.
-
-This lab *does not require Linux*, you can do experiments under Cygwin or MinGW
-on Windows, as long as you have a working toolchain under Cygwin (which is
-supported by Sourcery Codebench Lite, consult the installation instructions
-for details).  MSIM simulator is runnable under Cygwin and MinGW.
-
-A Linux is always preferred, though.
-
-### Knowledge Prerequisites
-
-This lab assumes that you have basic knowledge of MIPS assembly (you could
-get familiar with it in Lab 0), and basic C programming.
-
-Also, it assumes that you're familiar with using `man(1)`, and sometimes
-`info(1)`.
-
-- Make sure you have installed POSIX man pages if you're using Cygwin.
-
-This lab will teach you from writing assembly, C code, to writing Makefiles,
-linker scripts, up to framework designs.
-
-### Shipped files
-
-Make sure you have the following files:
-
-- `headers` directory
-    + `addrspace.h`
-    + `asm.h`
-    + `cp0regdef.h`
-    + `elf.h`
-    + `io.h`
-    + `irq.h`
-    + `mipsregs.h`
-    + `regdef.h`
-    + `stdarg.h`
-    + `stddef.h`
-    + `stdio.h`
-    + `string.h`
-    + `sys/types.h`
-- `src` directory
-    + `memcpy.c`
-    + `memset.c`
-    + `snprintf.c`
-
-Note that we'll (almost surely) move the headers and sources to elsewhere.
-
-### Examples and exercises
-
-This document contains different examples along with step-by-step exercises.
-It's highly recommended to stick to the exercises to complete the lab.
 
 ## What firmware should do
 
@@ -559,7 +502,7 @@ Assuming the output register for printer is mapped to physical address
 
 void kputs(const char *str)
 {
-        unsigned char *printer = (unsigned char *)0xbf000010;
+        unsigned char *printer = (unsigned char *)phys_to_virt(0x1f000010);
         for (; *str != '\0'; ++str)
                 *printer = *(unsigned char *)str;
 }
@@ -571,6 +514,71 @@ int main(void)
                 /* nothing */;
 }
 ```
+
+#### How to translate between physical and virtual address?
+
+One problem unresolved is that how to translate from physical address to
+virtual ones on MIPS, i.e. how to implement `phys_to_virt` function above.
+
+Before that, we need to learn the convention of MIPS physical address layout.
+The layout is rather simple:
+
+- Physical addresses from `0x00000000` to `0x0fffffff` correspond to RAM.
+- Physical addresses from `0x10000000` to `0x1fffffff` correspond to hardware
+  devices.
+    - Specially, `0x1fc00000` is the start of firmware address space.  The
+      actual size of address space depends on manufacturing.
+- The physical address layout above `0x20000000` is left entirely to the
+  manufacturer.
+
+Translating physical addresses lower than `0x20000000` is simple, depending
+on whether you want to, and be able to, employ caches.
+
+- If caches are available and you want to use caches, adding `0x80000000`
+  to the physical address yields the virtual address.
+    - Ideal for accessing RAM, since RAM contents are usually fully controlled
+      by the processor only.
+- If you're unable to use caches, or you don't want to use caches, then
+  adding `0xa0000000` to the physical address yields the virtual address.
+    - Hardware devices *MUST* be accessed in this manner.  The reason is that
+      on some MIPS processors, the consistency between CPU cache and hardware
+      devices are not maintained by hardware.
+    - MSIM simulates a transparent, perfect cache, so that external changes
+      in hardware devices can be immediately pushed back into caches.
+    - Loongson CPUs maintain consistency by hardware, so you don't need to
+      worry about inconsistency, either.
+
+Translating virtual addresses between `0x80000000` and `0xbfffffff` is
+therefore easy as well: just take the lower 29-bit and its done.
+
+There's no simple method compared to above to deal with physical addresses
+higher than `0x20000000`.  We'll deal with it in later labs.  For now,
+physical address `0x00000000` to `0x1fffffff` is sufficient.
+
+##### Paper exercise
+
+Consider, that we have an MSIM keyboard at physical address `0x1f000010`, and
+the CPU has a cache, whose consistency with the keyboard is not maintained by
+hardware, i.e. the changes at devices could not be reflected back to caches
+automatically.
+
+Each time a key is pressed, the program executes the following function, in
+which the keyboard is accessed through caches (by adding `0x80000000` to
+the physical address to obtain the virtual address):
+
+```C
+void keypress(void)
+{
+        volatile chae key = *(volatile char *)0x9f000010;
+        /* ... */
+}
+```
+
+1. What's the value of `key` when `keypress()` is executed the first time,
+  after key `a` is pressed?
+2. What's the value of `key` when `keypress()` is executed the second time,
+  after key `b` is pressed, if the cache still keeps the content of address
+  `0x9f000010`?
 
 ### Trap: optimization
 
@@ -760,13 +768,10 @@ SECTIONS {
 }
 ```
 
-The linker script tells the linker to
-
-1. Put `.text` section first, containing `.text` sections from all object files.
-2. Then, the linker should put `.rodata`, which contains `.rodata` sections from
-  all the object files, after `.text` section.
-3. Likewise, `.data` follows `.rodata`, and
-4. `.bss` follows `.data`.
+The linker script tells the linker to put `.text` section first, containing
+`.text` sections from all object files.  Then, the linker should put `.rodata`,
+which contains `.rodata` sections from all the object files, after `.text`
+section.  Likewise, `.data` follows `.rodata`, and `.bss` follows `.data`.
 
 Each section in `SECTIONS` command is specified with a list of sections
 from the object files in the following format:
