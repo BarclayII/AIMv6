@@ -538,6 +538,8 @@ on whether you want to, and be able to, employ caches.
   to the physical address yields the virtual address.
     - Ideal for accessing RAM, since RAM contents are usually fully controlled
       by the processor only.
+    - Therefore, the virtual address indicating the start of RAM is
+      `0x80000000`.
 - If you're unable to use caches, or you don't want to use caches, then
   adding `0xa0000000` to the physical address yields the virtual address.
     - Hardware devices *MUST* be accessed in this manner.  The reason is that
