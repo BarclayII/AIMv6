@@ -2894,16 +2894,15 @@ wrong with the binary.
 Milestones:
 
 1. Booting kernel
-2. Trap handling & SMP spinup
-3. Physical memory allocator (Buddy system or First-fit, allocating pages)
-4. Virtual memory allocator (SLAB, allocating bytes)
-5. Kernel thread management: `fork(2)`, `exit(2)`, `wait(2)`, `kill(2)`
+2. SMP spinup & spinlocks
+3. Trap handling
+4. Physical memory allocator (Buddy system or First-fit, allocating pages)
+5. Virtual memory allocator (SLAB, allocating bytes)
+6. Kernel thread management: `fork(2)`, `exit(2)`, `wait(2)`, `kill(2)`
     - Include basic signal handling
-6. Userspace thread management, context switches: `exec`
+7. Userspace thread management, context switches: `exec`
     - No file system involved
-7. Scheduler
-8. Synchronization: spinlocks
-    - Optional: semaphores
+8. Scheduler
 9. File system: simplified UFS
     - Optional challenge: implement the actual UFS
 10. (Optional) Migrate to Loongson using existing codebase
