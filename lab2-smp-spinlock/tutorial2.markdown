@@ -399,7 +399,7 @@ The advantages for adopting numerical labels are:
   one backward or forward.
 ```
         /* Sample code snippet 2 */
-1:      lw	a0, (a2)
+1:      lw      a0, (a2)
         beqz    a0, 1b          /* Branch to nearest numerical 1 backward */
 1:      lw      a1, 4(a2)
         blez    a1, 1b          /* Branch to nearest numerical 1 backward */
@@ -490,9 +490,8 @@ primitives:
 1. `release()`, or `unlock()`:
     - If the state is locked, set the state to unlocked.
 2. `acquire()`, or `lock()`:
-    - If the state is locked, wait until it's unlocked.
-    - As soon as the lock is unlocked, set the state to locked, **ensuring that
-      no one else is able to do the same**.
+    - Wait until the lock is unlocked, then change its state to locked, all
+      completed **at the same time, uninterrupted and exclusive**.
 
 The emphasized part, which is a kind of *atomicity*, a broader concept, is
 especially important,
@@ -611,15 +610,15 @@ The function body of `atomic32_set_bit` is
 ```C
 static inline void atomic32_set_bit(volatile uint32_t *addr, int pos)
 {
-	uint32_t result;
-	asm volatile (
-		"1:	ll	%[reg], %[mem];"
-		"	or	%[reg], %[val];"
-		"	sc	%[reg], %[mem];"
-		"	beqz	%[reg], 1b;"
-		: [reg]"=&r"(result), [mem]"+m"(*addr)
-		: [val]"ir"(1 << pos)
-	);
+        uint32_t result;
+        asm volatile (
+                "1:     ll      %[reg], %[mem];"
+                "       or      %[reg], %[val];"
+                "       sc      %[reg], %[mem];"
+                "       beqz    %[reg], 1b;"
+                : [reg]"=&r"(result), [mem]"+m"(*addr)
+                : [val]"ir"(1 << pos)
+        );
 }
 ```
 
@@ -733,13 +732,39 @@ exclusive access to the line printer.
 
 Change your Makefile and build your project.
 
-Your code still doesn't work, LOL.
+Your code still doesn't work, LOL.  Try to figure out the reason yourself.
+
+### A trap in locking
+
+Your code for locking above would probably look like:
+
+```C
+void spinlock_lock(struct spinlock *spinlock)
+{
+        do {
+                while (atomic_get_bit(&spinlock->state, LOCK_BIT))
+                        /* nothing */;
+        } while (atomic_try_set_bit(&spinlock->state, LOCK_BIT));
+}
+```
+
+However, obviously the locking procedure could be interrupted between waiting
+the lock state and changing the state.
+
+Suppose that CPU #1 and CPU #2 both observed that the state is unlocked.  They
+jump out of the inner loop.  If CPU #1 initiates and completes the `try_set_bit`
+primitive first, then CPU #2 initiates and completes the logic next, both
+of them may succeed, thinking that they've obtained the lock.
+
+Therefore, the locking logic should be implemented to be atomic as a whole,
+which probably requires you to write an inline assembly.
 
 ##### Programming exercise
 
-Trace the code and try to infer the reason, you'll see why Linux writes
-spinlock logic in architecture-specific code.
-
 Change your spinlock logic and move them to architecture-specific directory.
+
+You can refer to the code in `<asm/atomic.h>` to see how to write inline
+assembly.  The code there should be similar to what you'll write.
+
 Your code should work then.
 
