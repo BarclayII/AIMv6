@@ -2030,6 +2030,30 @@ entry function.
 
 You'll have to use *function pointers* to do so.
 
+### Why MBR?
+
+The computer should ultimatel/y locate the kernel on a storage, e.g.
+hard disk, CD-ROM, flash disk, etc.  However, the firmware can't directly
+find the kernel because of different partition schemes, different file systems,
+multiple kernels on different locations, etc.
+
+There are several methods to resolve this issue:
+
+1. Make the kernel's location another programmable attribute of firmware, just
+  like system time, firmware password, boot sequence, etc.  Loongson's original
+  firmware, PMON, does so.  This is usually a bad idea because
+    - The firmware should support file systems.
+    - It's hard to support multiple operating systems (dual-boot).
+2. Make it a convention that the firmware always executes some code somewhere on
+  the storage.  The content on storage is freely changeable by the user, unlike
+  firmware, and therefore enjoys more flexibility.  MBR and today's UEFI fall
+  into this category, the former assumes that the code on the first sector would
+  always be executed, the latter assumes that the code is stored as files on
+  some special partitions (called the *EFI system partition*).
+
+In our lab, for simplicity, we assumes that the kernel always reside on the
+*second* MBR partition.
+
 ### Code logic
 
 Suppose that you had already implemented your `readdisk` function:
