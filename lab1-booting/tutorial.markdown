@@ -2853,6 +2853,166 @@ C, rather than C++, for coding?
 2. Implement the macro `MSIM_LP_REG`, and put it in appropriate header file(s)
   or source file(s).
 
+## Demo: continuing framework implementation
+
+Suppose that we've already defined a primitive, `write_char`, for all line
+printers:
+
+```C
+struct lp {
+        void            (*write_char)(struct lp *, unsigned char);
+};
+```
+
+As we mentioned above, a line printer is a device:
+
+```C
+struct device {
+        /* ... */
+};
+
+struct lp {
+        struct device   dev;
+        void            (*write_char)(struct lp *, unsigned char);
+};
+```
+
+`struct device` stores basic information of a device, for example,
+physical address, as mentioned above:
+
+```C
+struct device {
+        unsigned long   phys_addr;
+        /* Other information here... */
+};
+
+struct lp {
+        struct device   dev;
+        void            (*write_char)(struct lp *, unsigned char);
+};
+```
+
+We had already implemented the `write_char` primitive for MSIM line
+printer:
+
+```C
+void msim_lp_write_char(struct lp *lp, unsigned char c)
+{
+        write8(MSIM_LP_REG(lp, MSIM_LP_OUT), c);
+}
+```
+
+Before emitting characters, we should initialize it, and register
+it into the device list, along with its `write_char` implementation.
+
+```C
+void msim_lp_init(unsigned long paddr)
+{
+        /*
+         * Nothing needed for device, though.
+         * So we only need to register the device with its physical address.
+         */
+        msim_lp_register(paddr);
+}
+```
+
+We should define a list of devices.  After implementing dynamic memory
+allocation we'll use a linked list for the device list, but here we're
+going to define a line printer structure array and a device pointer
+array instead:
+
+```C
+struct device *devs[MAXDEVS];   /* device pointer list */
+int ndevs;                      /* number of devices */
+struct lp lps[NR_LPS];          /* list of line printers */
+```
+
+Then, we register the device into the device pointer list:
+
+```C
+void device_register(struct device *dev)
+{
+        devs[ndevs++] = dev;
+}
+```
+
+And line printer to the line printer list:
+
+```C
+void msim_lp_register(unsigned long paddr)
+{
+        struct device *dev = &lps[0].dev;
+
+        dev->phys_addr = paddr;
+        dev->type = DEV_LP;                     /* device type */
+
+        lps[0].write_char = msim_lp_write_char; /* our implementation */
+
+        device_register(dev);                   /* register to device list */
+}
+```
+
+Finally, you should add the `msim_lp_init()` call into the `main()` routine
+in kernel.  On x86 systems it's done without hardwiring by probing PCI
+configuration space, but ARM and MIPS board involves more-or-less hardwiring
+anyway.  Nevertheless, you should hardwire "flexibly", by splitting generic
+initialization and machine-specific initialization, thereby supporting
+multiple machines by macro switches:
+
+```C
+/* This is only a demonstration, the actual code may be different */
+void main(void)
+{
+        /* ... */
+        mach_init();
+}
+
+/* Meanwhile, in machine-specific source file... */
+void mach_init(void)
+{
+        msim_lp_init(MSIM_LP_BASE);
+}
+```
+
+Then, we're focusing on implementing `kputs()`, by traversing the device list,
+checking whether it supports line output, and invoke their implementation of
+`write_char`, thereby supporting heterogeneous devices:
+
+```C
+/* The following code will be changed after dynamic memory allocation */
+void kputs(char *s)
+{
+        unsigned int i;
+        struct lp *lp;
+
+        for (i = 0; i < ndevs; ++i) {
+                /*
+                 * Check whether the device supports line printing, by
+                 * verifying device type.
+                 */
+                if (dev_support_lp(devs[i])) {
+                        /*
+                         * From the code above we can see that the pointer
+                         * to device structure in "devs" actually points
+                         * to a "struct lp".
+                         * This is a kind of inheritance, in terms of
+                         * object-oriented programming.
+                         */
+                        lp = (struct lp *)devs[i];
+                        lp_puts(lp, s);
+                }
+        }
+}
+
+/* Probably in somewhere else, not necessarily in the same file */
+void lp_puts(struct lp *lp, char *s)
+{
+        for (; *s != '\0'; ++s) {
+                lp->write_char(*s);
+        }
+}
+```
+
 ## Organizing kernel source files
 
 As we mainly focus on kernel development in our labs, how to organize
