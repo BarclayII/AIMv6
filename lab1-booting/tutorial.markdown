@@ -2078,7 +2078,7 @@ Moreover, assuming you're able to read the first sector:
 
 void execute_mbr(void)
 {
-        unsigned char mbr[SECTOR_SIZE];
+        unsigned char *mbr = MBR_INITIAL_ADDRESS;
         readdisk(0, 0, mbr, SECTOR_SIZE);
 }
 ```
@@ -2215,7 +2215,20 @@ your job.
 
 Personally, I suggest you to hardwire the MBR address in both firmware
 and MBR.  That is, the firmware loads the MBR into a fixed RAM address,
-say, `0x80001000`.  Then, we specify the initial address in linker script
+say, `0x80001000`.
+
+```C
+#define MBR_INITIAL_ADDRESS     0x80001000
+
+void execute_mbr(void)
+{
+        char *mbr = (char *)MBR_INITIAL_ADDRESS;
+	readdisk(0, 0, mbr, SECTOR_SIZE);
+	/* ... */
+}
+```
+
+Then, we specify the initial address in linker script
 of MBR to be `0x80001000`:
 
 ```
