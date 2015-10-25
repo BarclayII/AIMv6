@@ -2088,11 +2088,8 @@ Obviously one need to pass the address of `readdisk` to the bootloader.
 However, during code generation, the compiler and the linker usually have
 no idea where the MBR would be located in RAM, unless:
 
-1. The address is passed to bootloader as an argument, in which case you even
-  don't need to link it to an executable becuase a single object file is
-  enough, or
-2. The bootloader code is compiled and built to be *position-independent*, or
-3. The developer explicitly hardwires the address in firmware, and tells
+1. The bootloader code is compiled and built to be *position-independent*, or
+2. The developer explicitly hardwires the address in firmware, and tells
   the linker to generate code to run at that address.
 
 Either way, you will have to define another function type for bootloader
@@ -2100,15 +2097,19 @@ entrance, such as
 
 ```C
 /* Assuming that you adopt scheme 1 */
-typedef void (*bootentry_t)(readdisk_t, uintptr_t);
+typedef void (*bootentry_t)(readdisk_t);
 ```
 
 Then you'll transfer control to MBR in RAM by
 
 ```C
-        /* __mbr is the location where MBR in RAM is finally located */
+        /*
+         * __mbr is the location where MBR in RAM is finally located.
+         * Either it's position-independent, or you should specify the initial
+         * address in linker script for MBR.
+         */
         bootentry_t boot = (bootentry_t)__mbr;
-        (*boot)(readdisk, __mbr);
+        (*boot)(readdisk);
 ```
 
 ##### Programming exercise
@@ -2206,12 +2207,28 @@ You should probably write a Makefile by yourself now.
 Write a Makefile to:
 
 1. Compile your C source file into an object file, and
-2. Link it to an executable, if you decide not to pass the RAM
-  address of MBR as an argument, and
-3. Translate the executable (or object file) into binary.
+2. Link the object file into an ELF executable, and
+3. Translate the ELF executable into a solid binary.
 
 Disassemble the binary to see if the code would correctly do
 your job.
+
+Personally, I suggest you to hardwire the MBR address in both firmware
+and MBR.  That is, the firmware loads the MBR into a fixed RAM address,
+say, `0x80001000`.  Then, we specify the initial address in linker script
+of MBR to be `0x80001000`:
+
+```
+/* mbr.ld */
+/* ... */
+SECTIONS {
+        . = 0x80001000;
+        /* ... */
+}
+```
+
+This way, you won't need to deal with position-independent code, which
+is rather complicated in our settings.
 
 ### Testing size & Installing to disk image
 
