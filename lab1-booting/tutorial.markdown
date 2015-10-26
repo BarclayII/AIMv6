@@ -2420,7 +2420,12 @@ extern unsigned char cpu_stack[];
 Then we could change the assembly to
 
 ```asm
-/* firmware-entry.S */
+/* entry.S */
+/*
+ * Note: this entry point is for kernel, not firmware.
+ * Put this file at a reasonable position.  You can also change the file name
+ * according to your flavor.
+ */
 #include <asm/asm.h>
 #include <asm/regdef.h>
 #include <asm/cp0regdef.h>
