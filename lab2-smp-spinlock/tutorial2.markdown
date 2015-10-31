@@ -275,6 +275,10 @@ Then, according to `<asm/asm.h>`, the preprocessor would replace `MFC0` with
 `mfc0` or `dmfc0`, according to whether we're targetting MIPS32 or MIPS64
 processors.
 
+**Side note:** taking two parameters for `cpuid` pseudo-instruction is
+not necessary in our case.  I leave two there just for possible compatibility
+issues.  It's *totally* fine to leave only one parameter for `cpuid`.
+
 ### Obtaining CPU ID on MIPS Revision 1
 
 The bad news is that, MIPS32/64 Revision 1 (which is the case of MSIM) didn't
@@ -340,7 +344,7 @@ NESTED(__reset, 0, ra)          /* 0xbfc00000 */
         xori    a0, ST_ERL
         mtc0    a0, CP0_STATUS
         cpuid   a1, a2          /* Put CPU ID in register a1 */
-        bnez    __slave_entry   /* Jump elsewhere if slave */
+        bnez    a1, __slave_entry   /* Jump elsewhere if slave */
         li      sp, 0x8f000000
         jal     main
 END(__reset)
@@ -356,7 +360,7 @@ code to clear the mailbox, then poll it until something comes in.
 __slave_entry:
         li      a1, MSIM_ORDER_MAILBOX_BASE_VA
         sw      zero, (a1)
-poll:   lw      a0, (a2)
+poll:   lw      a0, (a1)
         beqz    a0, poll
         jr      a0
 ```
@@ -369,7 +373,7 @@ The following code is identical to the `__slave_entry` code above:
 __slave_entry:
         li      a1, MSIM_ORDER_MAILBOX_BASE_VA
         sw      zero, (a1)
-1:      lw      a0, (a2)
+1:      lw      a0, (a1)
         beqz    a0, 1b
         jr      a0
 ```
@@ -744,7 +748,7 @@ void spinlock_lock(struct spinlock *spinlock)
         do {
                 while (atomic_get_bit(&spinlock->state, LOCK_BIT))
                         /* nothing */;
-        } while (atomic_try_set_bit(&spinlock->state, LOCK_BIT));
+        } while (!atomic_try_set_bit(&spinlock->state, LOCK_BIT));
 }
 ```
 
