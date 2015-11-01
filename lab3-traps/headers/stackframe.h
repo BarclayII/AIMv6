@@ -26,50 +26,57 @@
  * but I wrote these manually to maintain readability and ctags friendliness.
  * Besides, you probably won't change the trap frame structure anyway.
  */
+
+#if defined(_MIPS_ARCH_MIPS32) || defined(_MIPS_ARCH_MIPS32R2)
+#define LONGSIZE		4
+#elif defined(_MIPS_ARCH_MIPS64) || defined(_MIPS_ARCH_MIPS64R2)
+#define LONGSIZE		8
+#endif
+
 #define TF_MEMBERS	39
-#define TF_SIZE		(TF_MEMBERS * 8)
+#define TF_SIZE		(TF_MEMBERS * LONGSIZE)
 
 /* Offsets */
-#define TF_ZERO	0x000
-#define TF_AT	0x008
-#define TF_V0	0x010
-#define TF_V1	0x018
-#define TF_A0	0x020
-#define TF_A1	0x028
-#define TF_A2	0x030
-#define TF_A3	0x038
-#define TF_T0	0x040
-#define TF_T1	0x048
-#define TF_T2	0x050
-#define TF_T3	0x058
-#define TF_T4	0x060
-#define TF_T5	0x068
-#define TF_T6	0x070
-#define TF_T7	0x078
-#define TF_S0	0x080
-#define TF_S1	0x088
-#define TF_S2	0x090
-#define TF_S3	0x098
-#define TF_S4	0x0a0
-#define TF_S5	0x0a8
-#define TF_S6	0x0b0
-#define TF_S7	0x0b8
-#define TF_T8	0x0c0
-#define TF_T9	0x0c8
-#define TF_K0	0x0d0
-#define TF_K1	0x0d8
-#define TF_GP	0x0e0
-#define TF_SP	0x0e8
-#define TF_S8	0x0f0
-#define TF_RA	0x0f8
+#define TF_ZERO	(0x00 * LONGSIZE)
+#define TF_AT	(0x01 * LONGSIZE)
+#define TF_V0	(0x02 * LONGSIZE)
+#define TF_V1	(0x03 * LONGSIZE)
+#define TF_A0	(0x04 * LONGSIZE)
+#define TF_A1	(0x05 * LONGSIZE)
+#define TF_A2	(0x06 * LONGSIZE)
+#define TF_A3	(0x07 * LONGSIZE)
+#define TF_T0	(0x08 * LONGSIZE)
+#define TF_T1	(0x09 * LONGSIZE)
+#define TF_T2	(0x0a * LONGSIZE)
+#define TF_T3	(0x0b * LONGSIZE)
+#define TF_T4	(0x0c * LONGSIZE)
+#define TF_T5	(0x0d * LONGSIZE)
+#define TF_T6	(0x0e * LONGSIZE)
+#define TF_T7	(0x0f * LONGSIZE)
+#define TF_S0	(0x10 * LONGSIZE)
+#define TF_S1	(0x11 * LONGSIZE)
+#define TF_S2	(0x12 * LONGSIZE)
+#define TF_S3	(0x13 * LONGSIZE)
+#define TF_S4	(0x14 * LONGSIZE)
+#define TF_S5	(0x15 * LONGSIZE)
+#define TF_S6	(0x16 * LONGSIZE)
+#define TF_S7	(0x17 * LONGSIZE)
+#define TF_T8	(0x18 * LONGSIZE)
+#define TF_T9	(0x19 * LONGSIZE)
+#define TF_K0	(0x1a * LONGSIZE)
+#define TF_K1	(0x1b * LONGSIZE)
+#define TF_GP	(0x1c * LONGSIZE)
+#define TF_SP	(0x1d * LONGSIZE)
+#define TF_S8	(0x1e * LONGSIZE)
+#define TF_RA	(0x1f * LONGSIZE)
 
-#define TF_LO		0x100
-#define TF_HI		0x108
-#define TF_STATUS	0x110
-#define TF_CAUSE	0x118
-#define TF_BADVADDR	0x120
-#define TF_EPC		0x128
-#define TF_ENTRYHI	0x130
+#define TF_LO		(0x20 * LONGSIZE)
+#define TF_HI		(0x21 * LONGSIZE)
+#define TF_STATUS	(0x22 * LONGSIZE)
+#define TF_CAUSE	(0x23 * LONGSIZE)
+#define TF_BADVADDR	(0x24 * LONGSIZE)
+#define TF_EPC		(0x25 * LONGSIZE)
+#define TF_ENTRYHI	(0x26 * LONGSIZE)
 
 #ifndef __ASSEMBLER__
 
