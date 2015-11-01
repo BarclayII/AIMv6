@@ -74,8 +74,9 @@ Denoting the base address of MSIM RTC `MSIM_RTC_BASE`:
 3. Implement two functions, `sleep(n)` and `usleep(n)`, to delay the processor
   for `n` seconds and `n` microseconds, respectively.  Your solution should be
   as precise as possible.
-    - It's allowed to implement both functions using only RTC.  If you decide
-      to do so, you can skip the first two tasks.
+    - It's allowed to implement both functions using only RTC.  But it's not
+      advised to skip the previous two tasks since `COUNT` is responsible to
+      generate timer interrupts.
 
 ## How exceptions/interrupts work on x86
 
@@ -343,15 +344,17 @@ Implement a trap handler, which
   (the last three are useful in later labs)
     - We save `STATUS`, `CAUSE`, `EPC` registers because we probably need
       to change their contents.
-2. Store the pointer to the trap frame to register `a0`.
-3. Jump to C trap handler entry:
+2. Ensure the processor runs in normal (no exception, no error), kernel mode,
+  without interrupts.
+3. Store the pointer to the trap frame to register `a0`.
+4. Jump to C trap handler entry:
 ```C
 void handle_exception(struct trapframe *tf)
 ```
   (or something like that)
-4. Dump the trap frame contents and jump to an endless loop.
-5. Restore the trap frame back to registers.
+5. Dump the trap frame contents and jump to an endless loop.
+6. Restore the trap frame back to registers.
     - This step would be useful later.
-6. `eret` to return from exception.
+7. `eret` to return from exception.
 
 ## Not finished
