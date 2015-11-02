@@ -451,3 +451,25 @@ Key pressed: A
 Key pressed: 1
 ```
 
+## System calls
+
+In this lab we're not designing system calls, but *handling* system call
+exceptions.
+
+The problem is that, after a system call exception happens, `EPC` points
+to that system call instruction (or the preceding branching instruction
+if it's inside a branch delay slot).  If we directly return back from
+exception handler, the system call instruction would be executed again,
+resulting into an endless loop.
+
+##### Programming exercise
+
+1. Write a system call handler to perform arbitrary task, e.g. printing
+  a message.
+2. Think of ways to "skip" the system call instruction and implement it.
+    - You may have to determine whether the system call instruction is
+      inside a branch delay slot, and if so, where the target is, and
+      whether the jump would be actually taken.
+    - You can see how to
+      reverse-engineer the 32-bit binary into instruction in
+      `asm/decode.h` and MIPS 64 Architecture Volume II.
