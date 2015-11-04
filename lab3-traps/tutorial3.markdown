@@ -260,6 +260,16 @@ above), the kernel should do the following:
   the architecture-specific return-from-exception instruction.  On
   MIPS, this is the `eret` instruction.
 
+### MIPS ABI: `k0` and `k1`
+
+MIPS ABI, which is the assembly convention for all MIPS programs, reserves
+`k0` and `k1` for exception-handling only.  They should not be touched
+elsewhere.  As such, C compilers won't use them for code generation.
+
+Therefore, in MIPS exception handling, `k0` and `k1` could be used safely for
+holding results or performing arithmetics before saving other GPRs, as you'll
+see in `stackframe.h`.
+
 ### `stackframe.h`
 
 Implementing the register saving/restoring process is quite time-consuming,
@@ -341,6 +351,48 @@ The address of the trap frame structure is thus stored at register `sp`.
 trap frame starting at `sp`, frees the trap frame from kernel stack, and
 executes `eret`.
 
+#### MIPS ABI: argument registers
+
+After we store everything inside a trap frame structure, we need to pass
+it to a C function *from assembly*.
+
+MIPS32 ABI specified 4 registers, from `a0` to `a3`, to hold the arguments
+if argument count is no more than 4.
+
+So, if you're going to call function `func` from assembly:
+
+```C
+func(1, 4, 6, 8);
+```
+
+You write
+
+```
+li      a0, 1
+li      a1, 4
+li      a2, 6
+li      a3, 8
+jal     func
+```
+
+Similarly, if a C function calls an assembly function `func_asm`:
+
+```C
+func_asm(1, 4, 6, 8);
+```
+
+You could retrieve the arguments by something like:
+
+```
+move    s0, a0          # 1
+move    s1, a1          # 4
+move    s2, a2          # 6
+move    s3, a3          # 8
+```
+
+Things would become complicated if argument count is more than 4 in MIPS32,
+but we probably won't need to deal with it.
+
 ##### Programming exercise
 
 Implement a trap handler, which
@@ -353,18 +405,17 @@ Implement a trap handler, which
       to change their contents.
 2. Ensure the processor runs in normal (no exception, no error), kernel mode,
   without interrupts.
-3. Store the pointer to the trap frame to register `a0`.
-4. Jump to C trap handler entry:
+3. Jump to C trap handler entry:
 ```C
 void handle_exception(struct trapframe *tf)
 ```
-  (or something like that)
-5. Dump the trap frame contents and jump to an endless loop.
+  (or something like that), with the trap frame address passed in.
+4. Dump the trap frame contents and jump to an endless loop.
     - This is the default behavior of handling kernel exceptions.  We'll
       dispatch the trap frame to appropriate handlers such as interrupt
       handlers or system call handlers later.
-6. Restore the trap frame back to registers.
-7. `eret` to return from exception.
+5. Restore the trap frame back to registers.
+6. `eret` to return from exception.
 
 ##### Programming exercise
 
