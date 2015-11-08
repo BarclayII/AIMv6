@@ -426,6 +426,9 @@ Modify your existing kernel codebase to
       the trap handlers, or at the kernel's entry point.
 2. Copy the exception handler to MIPS exception vectors, starting from
   `EBase` during trap handler initialization.
+    - Say, if your exception handler assembly entry is named
+      `__exception_entry`, you can copy the content to `EBase` and so on via
+      `memcpy` function.
     - Note that the exception vectors only reserve 128 bytes (32 instructions)
       for each handler.  Think of ways to circumvent this limitation.
 
