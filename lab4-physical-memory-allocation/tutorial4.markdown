@@ -184,8 +184,13 @@ It also defined several coprocessor registers for TLB management:
     - Bit 0 is the Global bit.
     - Bit 1 is the Valid bit.
     - Bit 2 is the Dirty bit.
-    - Bit 3 to 5 is a field indicating cache coherency, usually 3 for RAM, 2
-      for peripheral devices.
+    - Bit 3 to 5 is a field indicating cache coherency.
+        + For RAM accesses where caches could be exploited for accelerating
+          access speed, the field value is usually 3 (i.e. bit 4 and 3 set,
+          bit 5 clear).
+        + For peripheral device accesses where the contents could change by
+          their own, the field value is usually 2 (i.e. bit 4 set, bit 5 and
+          3 clear), to avoid using caches to access this virtual address.
     - Bit 6 and beyond is a field containing the PFN.
 4. `PAGEMASK`
     - A register containing bit masks indicating which bits should not
