@@ -114,7 +114,8 @@ simply **throws an exception**.
 #### Multiple matching entries?
 
 As TLB is managed by software on MIPS, unlike most architectures, a buggy
-software may write two entries with the same VPN to TLB.  This may shutdown
+software may write two entries with the same virtual page number (VPN) to TLB.
+This may shutdown
 the TLB altogether, or even cause severe damage to TLB on early MIPS
 processors.  Although hardware damage won't happen any more on modern
 processors, multiple matching entries may still cause undefined behavior,
