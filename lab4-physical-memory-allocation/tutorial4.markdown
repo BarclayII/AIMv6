@@ -338,6 +338,20 @@ extern unsigned char tlb_refill[];
 memcpy(EXCEPT_TLB, tlb_refill, EXCEPT_HANDLER_SIZE);
 ```
 
+### TLB initialization
+
+As TLB content is usually undetermined after being powered on, one should
+initialize TLB somewhere before using it.
+
+A typical TLB initializer fills up every TLB entry with distinct, "dummy"
+VPNs, and
+the V-bit cleared, so as to throw an exception to require the software
+to fill in meaningful context whenever those "dummy" VPNs are accessed.
+
+The TLB initializer could be used to "flush" the TLB between context
+switches (i.e. switching from user to kernel, or switching between
+processes) as well.
+
 ##### Programming task
 
 1. Design a kernel memory mapping to address all 2GB RAMs however you like.
@@ -346,6 +360,10 @@ memcpy(EXCEPT_TLB, tlb_refill, EXCEPT_HANDLER_SIZE);
       by software.
 2. Implement the TLB refill handler, and modify the trap initialization routine
   to take your TLB refill handler.
+3. Implement the TLB initializer function, and invoke it somewhere before
+  TLB is being used.
+
+It's even better to have your TLB handler tested.
 
 ### MIPS64 variant
 
