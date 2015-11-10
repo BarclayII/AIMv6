@@ -360,10 +360,15 @@ processes) as well.
 
 ##### Programming task
 
-1. Design a kernel memory mapping to address all 2GB RAMs however you like.
+1. Design a virtual-to-physical memory mapping for the kernel to address all
+  2GB RAMs however you like.
     - The mapping could be either static (via simple rules) or using a
       hierarchical page table.  It's flexible since TLB filling is performed
       by software.
+    - You should take `NULL` pointers into consideration, though.  Usually,
+      dereferencing a `NULL` pointer (pointing to address 0) results into an
+      exception.  Therefore, you should reserve a small portion starting from
+      0 to catch the bad pointers.
 2. Implement the TLB refill handler, and modify the trap initialization routine
   to take your TLB refill handler.
 3. Implement the TLB initializer function, and invoke it somewhere before
