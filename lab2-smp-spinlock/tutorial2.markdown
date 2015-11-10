@@ -95,6 +95,10 @@ communication device":
 add dorder ord0 <your-physical-address> <your-interrupt-mask>
 ```
 
+**NOTE**: The mask could be any number between 2~6, since 0 and 1 are reserved
+for software interrupts (used for signal handling).  Also, you should the same
+number as other devices such as disk drive.
+
 *Mailbox registers* are commonly implemented on modern MIPS chips (such as
 Loongson, SGI Octane, etc.), one set per processor, to
 store some parameters or arguments for inter-processor communication.
@@ -111,6 +115,11 @@ mailbox2 generic <mailbox-size>
 add rwm mailbox3 <physical-address + mailbox-size * 3>
 mailbox3 generic <mailbox-size>
 ```
+
+**NOTE**: several bytes (say, 8 bytes) is usually enough for a mailbox, since
+it's usually storing integers, pointers, etc.  The physical address could be
+any number between `0x10000000 - 0x20000000`, where the processor could
+directly address without involvement of MMU.
 
 Note that although `mailboxN` are read-write memory, they should not
 be treated as a part of RAM, as they're a component of a whole
