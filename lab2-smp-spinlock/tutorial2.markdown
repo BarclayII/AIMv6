@@ -96,8 +96,8 @@ add dorder ord0 <your-physical-address> <your-interrupt-mask>
 ```
 
 **NOTE**: The mask could be any number between 2~6, since 0 and 1 are reserved
-for software interrupts (used for signal handling).  Also, you should the same
-number as other devices such as disk drive.
+for software interrupts (used for signal handling).  Also, you should avoid to
+use the same number as other devices such as disk drive.
 
 *Mailbox registers* are commonly implemented on modern MIPS chips (such as
 Loongson, SGI Octane, etc.), one set per processor, to
