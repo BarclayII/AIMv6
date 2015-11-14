@@ -358,6 +358,42 @@ extern unsigned char tlb_refill[];
 memcpy(EXCEPT_TLB, tlb_refill, EXCEPT_HANDLER_SIZE);
 ```
 
+#### Excluding usage of `at` register
+
+When generating code from assembly, the assembler may exploit `at` register,
+which is reserved by MIPS ABI for temporarily holding the intermediate result
+when calculating big numbers.  This is not very desirable during (early stages
+of) exception handling, as using `at` in a handler before preserving it may
+overwrite its contents.
+
+The `.set noat` directive instructs the assembler to not use the `at` register,
+while `.set at` makes `at` register available for usage.
+
+For the refill handler above, adding `.set noat` and `.set at` makes the
+handler "safer":
+
+```
+LEAF(tlb_refill)
+        j       __tlb_refill
+END(tlb_refill)
+
+__tlb_refill:
+        .set    noat
+        MFC0    k0, CP0_ENTRYHI
+        or      k0, 0xff
+        xor     k0, 0xff
+        SRL     k1, k0, 6
+        or      k1, TLB_CACHE_UNCACHED | TLB_VALID | TLB_DIRTY | TLB_GLOBAL
+        MTC0    k1, CP0_ENTRYLO0
+        SRL     k1, k0, 6
+        ADD     k1, 1 << 6
+        or      k1, TLB_CACHE_UNCACHED | TLB_VALID | TLB_DIRTY | TLB_GLOBAL
+        MTC0    k1, CP0_ENTRYLO1
+        tlbwr
+        eret
+        .set    at
+```
+
 ### TLB initialization
 
 As TLB content is usually undetermined after being powered on, one should
