@@ -24,7 +24,12 @@
 
 /* Only available in MIPS64 */
 #if defined(_MIPS_ARCH_MIPS64) || defined(_MIPS_ARCH_MIPS64R2)
+/* KSU mask is used for matching VA[63:62], though you could ignore it
+ * safely. */
 #define ENTRYHI_KSU_MASK	0xc000000000000000LL
+# define ENTRYHI_KSU_USER	0x0000000000000000LL
+# define ENTRYHI_KSU_SUPERVISOR	0x4000000000000000LL
+# define ENTRYHI_KSU_KERNEL	0xc000000000000000LL
 #define ENTRYHI_KSU(entryhi)	((entryhi) & ENTRYHI_KSU_MASK)
 #endif
 
