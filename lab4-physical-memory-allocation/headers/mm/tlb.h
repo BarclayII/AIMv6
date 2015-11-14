@@ -20,9 +20,14 @@
 
 /* TLB "virtual" entries (ENTRYHI) */
 #define ENTRYHI_ASID_MASK	0xff
-#define ENTRYHI_KSU_MASK	0xc0000000
 #define ENTRYHI_ASID(entryhi)	((entryhi) & ENTRYHI_ASID_MASK)
+
+/* Only available in MIPS64 */
+#if defined(_MIPS_ARCH_MIPS64) || defined(_MIPS_ARCH_MIPS64R2)
+#define ENTRYHI_KSU_MASK	0xc000000000000000LL
 #define ENTRYHI_KSU(entryhi)	((entryhi) & ENTRYHI_KSU_MASK)
+#endif
+
 /*
  * You should probably write a function/macro for obtaining VPN
  * by your own, according to your design.
