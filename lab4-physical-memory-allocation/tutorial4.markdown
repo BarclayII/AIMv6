@@ -30,13 +30,13 @@ We also want to specify the size, by either:
 
 - Directly allocate from memory:
 ```
-rwm generic 1792M
+xram generic 1790M
 ```
   or,
 - Using memory mapping technique to read-write on a file instead,
   if your memory is scarce:
 ```
-rwm fmap "mem.img"
+xram fmap "mem.img"
 ```
   You should create an empty 1792M file `mem.img`, though.
 
@@ -120,6 +120,12 @@ the TLB altogether, or even cause severe damage to TLB on early MIPS
 processors.  Although hardware damage won't happen any more on modern
 processors, multiple matching entries may still cause undefined behavior,
 and therefore should be avoided.
+
+In MSIM, having multiple matching entries in a TLB would make the processor
+fall back to use the generic handler when a TLB exception occur.
+
+Loongson processor manual states that the behavior is undefined in such
+situation.
 
 ### TLB refill exceptions
 
@@ -347,7 +353,9 @@ memcpy(EXCEPT_TLB, tlb_refill, EXCEPT_HANDLER_SIZE);
 ### TLB initialization
 
 As TLB content is usually undetermined after being powered on, one should
-initialize TLB somewhere before using it.
+initialize TLB somewhere before using it, as the TLB content is usually
+undefined, and may have
+[multiple matching TLB entries](#multiple-matching-entries).
 
 A typical TLB initializer fills up every TLB entry with distinct, "dummy"
 VPNs, and

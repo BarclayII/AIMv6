@@ -13,7 +13,7 @@
 #define ENTRYLO_PFN(entrylo)	((entrylo) >> 6)	/* PFN */
 #define ENTRYLO_GLOBAL		0x1		/* ignore ASID */
 #define ENTRYLO_VALID		0x2		/* valid */
-#define ENTRYLO_DIRTY		0x3		/* writable */
+#define ENTRYLO_DIRTY		0x4		/* writable */
 #define ENTRYLO_CACHEMASK	0x38
 # define ENTRYLO_UNCACHED	0x10		/* uncached access */
 # define ENTRYLO_CACHE_COHERENT	0x18		/* cache coherent */
