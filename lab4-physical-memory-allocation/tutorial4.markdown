@@ -30,12 +30,15 @@ We also want to specify the size, by either:
 
 - Directly allocate from memory:
 ```
+# Due to inherent flaw in MSIM the size should not be slightly smaller than
+# 1792M, or overflow may happen.
 xram generic 1790M
 ```
   or,
 - Using memory mapping technique to read-write on a file instead,
   if your memory is scarce:
 ```
+# This way the size of XRAM could be exactly 1792M, not causing overflow
 xram fmap "mem.img"
 ```
   You should create an empty 1792M file `mem.img`, though.
