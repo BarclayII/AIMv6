@@ -114,6 +114,11 @@ or devices with physical address obtained.  If the processor can't find the
 virtual address in TLB, or the virtual address is marked invalid there, it
 simply **throws an exception**.
 
+The number of TLB entries is either available in `CONFIG1` register for
+Revision 2 architectures (which is not our case), or in processor manuals.
+In MSIM, as it's simulating a R4000 processor, the number of TLB entries
+is 48.
+
 #### Multiple matching entries?
 
 As TLB is managed by software on MIPS, unlike most architectures, a buggy
