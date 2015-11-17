@@ -461,16 +461,20 @@ void slave_main(void)
     - You can write a separate entry point dedicated to slaves, just like in
       xv6, or you can rewrite and reuse the main entry point `__start`.
     - If you choose to use a separate slave entry point, you should write like:
+
 ```
 LEAF(__slave_entry)
         /* ... */
 END(__slave_entry)
 ```
+
       and reference the entry using its name in C source code, with the
       following declaration (the return type and argument list may differ):
+
 ```C
 extern void __slave_entry(void);
 ```
+
 3. Implement `smp_startup()` function, where the master puts each slave's entry
   points into its mailbox, as well as other arguments.
 
