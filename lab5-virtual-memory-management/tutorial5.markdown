@@ -420,3 +420,10 @@ What if we create a slab for every distinct, requested size?
 
 The primary goal is to work by whatever means.
 
+##### Programming exercise
+
+Since arbitrary memory allocation are implemented, you can test whether a
+linked list works as expected.
+
+If you introduced a `struct device` list to manage devices, update your
+implementation from using arrays to using (double-)linked lists.
