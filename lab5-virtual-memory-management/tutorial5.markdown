@@ -223,11 +223,194 @@ the slab, marking the chunk as free.  If the slab is empty (i.e. no chunk is
 used by others), the allocator may keep the slab, or return it to the base
 page allocator.
 
+### A concrete example
+
+Suppose that we're doing SLAB allocation on these idle pages:
+
+```
+Full slabs:
+
+Available slabs:
+
+Page list:
+        +----------------------------------------------------------------+
+Page 1: |                                                                |
+        +----------------------------------------------------------------+
+Page 2: |                                                                |
+        +----------------------------------------------------------------+
+Page 3: |                                                                |
+        +----------------------------------------------------------------+
+Page 4: |                                                                |
+        +----------------------------------------------------------------+
+```
+
+The first request is `kmalloc(32)`.  The SLAB allocator finds an idle page,
+splitting it into several 32-byte chunks, making the page a 32-byte slab:
+
+```
+Full slabs:
+
+Available slabs:
+        32:     Page 1
+
+Page list:
+        +----------------------------------------------------------------+
+Page 1: |    |    |    |    |    |    |    |    |    |    |    |    |    |
+        +----------------------------------------------------------------+
+Page 2: |                                                                |
+        +----------------------------------------------------------------+
+Page 3: |                                                                |
+        +----------------------------------------------------------------+
+Page 4: |                                                                |
+        +----------------------------------------------------------------+
+```
+
+Then the allocator hands over one chunk in Page 1:
+
+```
+Full slabs:
+
+Available slabs:
+        32:     Page 1
+
+Page list:
+        +----------------------------------------------------------------+
+Page 1: |XXXX|    |    |    |    |    |    |    |    |    |    |    |    |
+        +----------------------------------------------------------------+
+Page 2: |                                                                |
+        +----------------------------------------------------------------+
+Page 3: |                                                                |
+        +----------------------------------------------------------------+
+Page 4: |                                                                |
+        +----------------------------------------------------------------+
+```
+
+The same happens when serving other different-sized requests such as
+`kmalloc(48)` and `kmalloc(72)`:
+
+```
+Full slabs:
+
+Available slabs:
+        32:     Page 1
+        48:     Page 2
+        72:     Page 3
+
+Page list:
+        +----------------------------------------------------------------+
+Page 1: |AAAA|    |    |    |    |    |    |    |    |    |    |    |    |
+        +----------------------------------------------------------------+
+Page 2: |BBBBBB|      |      |      |      |      |      |      |      | |
+        +----------------------------------------------------------------+
+Page 3: |CCCCCCCCC|         |         |         |         |         |    |
+        +----------------------------------------------------------------+
+Page 4: |                                                                |
+        +----------------------------------------------------------------+
+```
+
+Subsequent requests of the same size makes the allocator find available chunks
+in available slabs:
+
+```
+Full slabs:
+        32:     Page 1
+
+Available slabs:
+        48:     Page 2
+        72:     Page 3
+
+Page list:
+        +----------------------------------------------------------------+
+Page 1: |AAAA|aaaa|1111|2222|3333|4444|5555|6666|7777|8888|9999|0000|qqqq|
+        +----------------------------------------------------------------+
+Page 2: |BBBBBB|      |      |      |      |      |      |      |      | |
+        +----------------------------------------------------------------+
+Page 3: |CCCCCCCCC|         |         |         |         |         |    |
+        +----------------------------------------------------------------+
+Page 4: |                                                                |
+        +----------------------------------------------------------------+
+```
+
+If all slabs of requested size is full, the allocator makes a new slab:
+
+```
+Full slabs:
+        32:     Page 1
+
+Available slabs:
+        32:     Page 4
+        48:     Page 2
+        72:     Page 3
+
+Page list:
+        +----------------------------------------------------------------+
+Page 1: |AAAA|aaaa|1111|2222|3333|4444|5555|6666|7777|8888|9999|0000|qqqq|
+        +----------------------------------------------------------------+
+Page 2: |BBBBBB|      |      |      |      |      |      |      |      | |
+        +----------------------------------------------------------------+
+Page 3: |CCCCCCCCC|         |         |         |         |         |    |
+        +----------------------------------------------------------------+
+Page 4: |QQQQ|    |    |    |    |    |    |    |    |    |    |    |    |
+        +----------------------------------------------------------------+
+```
+
+When deallocating a chunk, the allocator adds the chunk back to the list of
+free chunks in the corresponding slab, so that next requests with the same
+size can reuse the chunk.  Since a page is equally divided into such chunks,
+both external fragmentation and internal fragmentation are minimized and
+manageable:
+
+```
+Full slabs:
+
+Available slabs:
+        32:     Page 4, Page 1
+        48:     Page 2
+        72:     Page 3
+
+Page list:
+        +----------------------------------------------------------------+
+Page 1: |AAAA|aaaa|1111|    |3333|4444|5555|6666|7777|8888|9999|0000|qqqq|
+        +----------------------------------------------------------------+
+Page 2: |BBBBBB|      |      |      |      |      |      |      |      | |
+        +----------------------------------------------------------------+
+Page 3: |CCCCCCCCC|         |         |         |         |         |    |
+        +----------------------------------------------------------------+
+Page 4: |QQQQ|    |    |    |    |    |    |    |    |    |    |    |    |
+        +----------------------------------------------------------------+
+```
+
+There are choices for an empty slab: you can reserve it for future use, or
+return it back to the page allocator, so that it may be used for a
+different-sized slab:
+
+```
+Full slabs:
+
+Available slabs:
+        32:     Page 1
+        48:     Page 2
+        72:     Page 3
+
+Page list:
+        +----------------------------------------------------------------+
+Page 1: |AAAA|aaaa|1111|    |3333|4444|5555|6666|7777|8888|9999|0000|qqqq|
+        +----------------------------------------------------------------+
+Page 2: |BBBBBB|      |      |      |      |      |      |      |      | |
+        +----------------------------------------------------------------+
+Page 3: |CCCCCCCCC|         |         |         |         |         |    |
+        +----------------------------------------------------------------+
+Page 4: |                                                                |
+        +----------------------------------------------------------------+
+```
+
+##### Paper exercise
+
+What if we create a slab for every distinct, requested size?
+
 ##### Programming exercise
 
 1. Design a SLAB allocator yourself.
-    - You should take external fragmentation, internal fragmentation, and
-      memory efficiency into consideration.
 2. Implement a SLAB allocator to allocate/free arbitrarily-sized memory
   chunks efficiently.
     - You should implement `kmalloc()` and `kfree()` function, which are similar
