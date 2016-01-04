@@ -1,12 +1,12 @@
-# xxv6
+# AIMv6
 
-Reimplementation and extension of teaching operating system xv6.
+Reimplementation and extension of the teaching operating system xv6 on multiple platforms.
 
 Architectures (to be) included: ARM, MIPS64, i386 (the original xv6 implementation)
 
 Our first goal is to port xv6 onto ARM and MIPS64 (Loongson 2H).
 
-The guides for placing and organizing source codes are in FILES in each directory.
+The guides to organize source codes can be found in each directory under FILE.
 
 Remember to add license information on top of the source code :)
 
@@ -16,14 +16,14 @@ there.
 Please refer to the `doc` directory for documentations.
 
 ### Toolchain
-Ideally, the project should be compilable by the latest GCC (or cross-GCC if
-cross-compiling) toolchain available on either Linux distro.
+Ideally, the project should be compiled by the latest GCC (or cross-GCC if
+cross-compiling) toolchain available on Linux distro.
 
-If prebuilt packages are not available, it is always welcomed to use precompiled
-binaries and libraries provided by the manufacturers.
+If prebuilt packages are not available, please use precompiled
+binaries and libraries provided by manufacturers.
 
 If you're a determined, patient geek, you can build your own cross-compiler
-from source.
+from source code, as illustrated below.
 
 #### Fedora
 Fedora ships cross-compiler packages since release 18, and there's really no
@@ -71,13 +71,11 @@ MIPS equivalent.
 
 For ARM developers, running
 ```
-$ sudo apt-get install gcc-4.9-arm-linux-gnueabi
-// commented by Leon on Jan. 4th, 2016, on Ubuntu 14.04, above commend should be 
 $ sudo apt-get install gcc-arm-linux-gnueabi
 ```
 would do everything.
 
-Obtaining MIPS toolchain is even more complicated.  First, you need to install
+Obtaining MIPS toolchain is somewhat more complicated.  First, you need to install
 `gdebi`:
 ```
 $ sudo apt-get install gdebi
