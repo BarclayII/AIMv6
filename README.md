@@ -72,6 +72,8 @@ MIPS equivalent.
 For ARM developers, running
 ```
 $ sudo apt-get install gcc-4.9-arm-linux-gnueabi
+// commented by Leon on Jan. 4th, 2016, on Ubuntu 14.04, above commend should be 
+$ sudo apt-get install gcc-arm-linux-gnueabi
 ```
 would do everything.
 
