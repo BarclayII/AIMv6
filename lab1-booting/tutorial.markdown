@@ -31,6 +31,41 @@ for details).  MSIM simulator is runnable under Cygwin and MinGW.
 
 A Linux is always preferred, though.
 
+**Fedora users**: Fedora ships a MIPS toolchain by default:
+
+```
+# dnf install gcc-mips64-linux-gnu
+```
+
+#### Third-party installation notes
+
+Sourcery Codebench provides a toolchain
+[here](http://sourcery.mentor.com/public/gnu_toolchain/mips-linux-gnu/).
+
+Read the installation instructions in
+[this document](https://sourcery.mentor.com/GNUToolchain/doc22952/getting-started.pdf),
+chapter 2 in particular, before installing.
+
+**Ubuntu users:**
+
+Download the `.bin` executable and execute it.
+
+You can also simply download the latest TGZ package and unpack it in your `/usr/local`
+directory.  The installer executable is usually a safer approach, though.
+
+If you are running Ubuntu 64-bit, make sure you have installed 32-bit C runtime:
+
+```
+sudo apt-get install libc6-i386
+```
+
+You will get a strange error stating that the executable could not be found
+otherwise.
+
+**Cygwin users:**
+
+Download the Windows executable and follow the instructions in the document above.
+
 ### Knowledge Prerequisites
 
 This lab assumes that you have basic knowledge of MIPS assembly (you could
