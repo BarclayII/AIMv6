@@ -17,7 +17,7 @@
 # The linker should be
 # 	mips64-linux-gnu-ld
 # etc.
-CROSS_COMPILE	=  mips64-linux-gnu-
+CROSS_COMPILE	=  mips64el-n64-linux-uclibc-
 
 # Machine name.
 MACH		=  loongson3a

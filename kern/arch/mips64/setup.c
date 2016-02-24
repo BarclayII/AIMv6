@@ -72,11 +72,12 @@ void usleep(unsigned int usec)
 		/* nothing */;
 }
 
+#if 1
 void setup_arch(void)
 {
 	int i, j;
 	uint32_t bar;
-	int port, slave;
+	int port = 0, slave = 0;
 	uint8_t stat;
 
 	/* Initialize hardware clocks */
@@ -84,6 +85,19 @@ void setup_arch(void)
 
 	uint32_t addr;
 	uint64_t addr64;
+
+	addr = 0x1a000000 | (0x11 << 11) | (0x40);
+	out32(addr, in32(addr) | 0x1);
+
+	addr = 0x1a000000 | (0x11 << 11) | (0x9);
+	out8(addr, 0x8f);
+	addr = 0x1a000000 | (0x11 << 11) | (0xa);
+	out8(addr, 0x01);
+
+	addr = 0x1a000000 | (0x11 << 11) | (0x40);
+	out32(addr, in32(addr) & ~0x1);
+	addr = 0x1a000000 | (0x11 << 11) | (0x8);
+	printk("SATA Class Code: %08x\r\n", in32(addr));
 
 	addr = 0x1a000000 | (0x11 << 11) | (0x24);
 	uint32_t bar5 = in32(addr);
@@ -107,11 +121,17 @@ void setup_arch(void)
 		}
 	}
 
+	printk("Port, Slave = %d, %d\r\n", port, slave);
+
+	out32(0xefdfb0000f0, 0);
+	out32(0xefdfb0000f8, 0);
+
 	printk("Setting up HT interrupts\r\n");
 
 #define IO_REGS_BASE	0x3ff00000
+	out8(0x3ff0140a, 0x11);			/* LPC to core 0 int 0 */
 	for (addr = 0x3ff01418; addr <= 0x3ff0141f; ++addr)
-		out8(addr, 0x21);
+		out8(addr, 0x21);		/* HT1 to core 0 int 1 */
 
 	/*
 	for (addr64 = 0xefdfb0000a0; addr64 <= 0xefdfb0000bc; addr64 += 4)
@@ -121,43 +141,112 @@ void setup_arch(void)
 	uint32_t inten = in32(0x3ff01424);
 	out32(0x3ff01428, inten | (0xffff << 16) | (1 << 10));
 
-	printk("Setting up i8259A\r\n");
-	/* i8259A, see picinit() in xv6 */
-	out8(0xefdfc000021, 0xff);		/* PIC_MASTER_IMR */
-	out8(0xefdfc0000a1, 0xff);		/* PIC_SLAVE_IMR */
-	out8(0xefdfc000020, 0x11);		/* PIC_MASTER_CMD */
-	out8(0xefdfc000021, 32);		/* T_IRQ0 */
-	out8(0xefdfc000021, 1 << 2);		/* PIC_CASCADE_IR */
-	out8(0xefdfc000021, 0x1);		/* Normal EOI as Linux/MIPS */
-	out8(0xefdfc0000a0, 0x11);		/* PIC_SLAVE_CMD */
-	out8(0xefdfc0000a1, 40);		/* T_IRQ0 + 8 */
-	out8(0xefdfc0000a1, 2);
-	out8(0xefdfc0000a1, 0x1);		/* ditto */
-	/* not doing these as in Linux/MIPS */
-	/*
-	out8(0xefdfc000020, 0x68);
-	out8(0xefdfc000020, 0x0a);
-	out8(0xefdfc0000a0, 0x68);
-	out8(0xefdfc0000a0, 0x0a);
-	*/
-	out8(0xefdfc000021, 0xff);
-	out8(0xefdfc0000a1, 0xff);
-
-	/* Identify device */
+	/* Setting up i8259A interrupts */
+	out8(0x18000021, 0xff);		/* PIC_MASTER_IMR */
+	out8(0x180000a1, 0xff);		/* PIC_SLAVE_IMR */
+	out8(0x18000020, 0x11);		/* PIC_MASTER_CMD */
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000021, 0);		/* T_IRQ0 */
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000021, 1 << 2);		/* PIC_CASCADE_IR */
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000021, 0x1);		/* Normal EOI as Linux/MIPS */
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x180000a0, 0x11);		/* PIC_SLAVE_CMD */
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x180000a1, 8);		/* T_IRQ0 + 8 */
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x180000a1, 2);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x180000a1, 0x1);		/* ditto */
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	out8(0x18000080, 0);
+	usleep(100);
+	/* Enable all i8259A interrupts */
+	out8(0x18000021, 0x00);
+	out8(0x180000a1, 0x00);
+	/* Read 1st sector */
 	uint32_t cause = read_c0_cause();
 	printk("CAUSE BEFORE: %08x\r\n", cause);
+	out8(0x18000020, 0x0a);
+	out8(0x180000a0, 0x0a);
+	printk("IRR_MASTER: %02x\r\n", in8(0x18000020));
+	printk("IRR_SLAVE:  %02x\r\n", in8(0x180000a0));
+	out8(0x18000020, 0x0b);
+	out8(0x180000a0, 0x0b);
+	printk("ISR_MASTER: %02x\r\n", in8(0x18000020));
+	printk("ISR_SLAVE:  %02x\r\n", in8(0x180000a0));
+	printk("IMR_MASTER: %02x\r\n", in8(0x18000021));
+	printk("IMR_SLAVE:  %02x\r\n", in8(0x180000a1));
+	out32(bar5 + 4, 0x2);
+	printk("BAR5 GHC: %08x\r\n", in32(bar5 + 4));
+	addr = 0x1a000000 | (0x11 << 11) | 0;
+	printk("DEV ID: %08x\r\n", in32(addr));
+	addr = 0x1a000000 | (0x11 << 11) | 0x4;
+	printk("DEV CMD: %08x\r\n", in32(addr));
+	addr = 0x1a000000 | (0x11 << 11) | (0x10 + 4 * (port + 4));
+	uint32_t bar4 = in32(addr) | 0x18000000;
+	bar4 &= ~0xf;
+	printk("BUS-MASTER STATUS: %02x\r\n", in8(bar4 + 0x2));
+	printk("BUS-MASTER STATUS: %02x\r\n", in8(bar4 + 0xa));
 	addr = 0x1a000000 | (0x11 << 11) | (0x10 + 4 * port);
 	bar = in32(addr) | 0x18000000;
 	bar &= ~0x7;
 	addr = 0x1a000000 | (0x11 << 11) | (0x10 + 4 * (port + 1));
 	uint32_t bar_ctrl = in32(addr) | 0x18000000;
-	bar_ctrl &= ~0x7;
-	printk("Identifying device...\r\n");
+	bar_ctrl &= ~0x3;
+	printk("Reading 1st sector...\r\n");
+	out8(bar + 0x2, 1);
+	out8(bar + 0x3, 0);
+	out8(bar + 0x4, 0);
+	out8(bar + 0x5, 0);
 	out8(bar + 0x6, 0xe0 + (slave << 4));
 	out8(bar_ctrl + 0x2, 0x0);	/* Interrupt */
-	out8(bar + 0x7, 0xec);
-	while (cause == read_c0_cause())
+	out8(bar + 0x7, /*0xec*/0x20);
+	/* It's expected that the two CAUSE register values should be different
+	 * indicating that an interrupt visible to the processor happened.
+	 * Not working now, though. */
+	while (cause == read_c0_cause()) {
 		/* nothing */;
+		out8(0x18000020, 0x0a);
+		out8(0x180000a0, 0x0a);
+		printk("IRR_MASTER: %02x\r\n", in8(0x18000020));
+		printk("IRR_SLAVE:  %02x\r\n", in8(0x180000a0));
+		out8(0x18000020, 0x0b);
+		out8(0x180000a0, 0x0b);
+		printk("ISR_MASTER: %02x\r\n", in8(0x18000020));
+		printk("ISR_SLAVE:  %02x\r\n", in8(0x180000a0));
+		printk("IMR_MASTER: %02x\r\n", in8(0x18000021));
+		printk("IMR_SLAVE:  %02x\r\n", in8(0x180000a1));
+		printk("BUS-MASTER STATUS: %02x\r\n", in8(bar4 + 0x2));
+		printk("BUS-MASTER STATUS: %02x\r\n", in8(bar4 + 0xa));
+		addr = 0x1a000000 | (0x11 << 11) | 0x4;
+		printk("DEV CMD: %08x\r\n", in32(addr));
+		usleep(2000000);
+	}
 	printk("CAUSE AFTER: %08x\r\n", read_c0_cause());
 	if ((stat = in8(bar + 0x7)) & 0x01) {
 		printk("ERROR?\r\n");
@@ -178,3 +267,4 @@ void setup_arch(void)
 	}
 	printk("Finished\r\n");
 }
+
