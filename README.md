@@ -2,13 +2,13 @@
 
 Reimplementation and extension of the teaching operating system xv6 on multiple platforms.
 
-Architectures (to be) included: ARM, MIPS64, i386 (the original xv6 implementation)
+Architectures (to be) included: ARM, MIPS64, i386 (the original xv6 implementation).
 
 Our first goal is to port xv6 onto ARM and MIPS64 (Loongson 2H).
 
 The guides to organize source codes can be found in each directory under FILE.
 
-Remember to add license information on top of the source code :)
+Remember to add license information on top of the source code :).
 
 This repository supersedes xv6-Loongson3A, the code from which will be migrated
 there.
@@ -30,7 +30,7 @@ Fedora ships cross-compiler packages since release 18, and there's really no
 reason to keep using unsupported old versions.
 
 To install MIPS toolchain, execute (replace `dnf` with `yum` if you're running
-older release)
+older release):
 ```
 # dnf install gcc-mips64-linux-gnu
 ```
@@ -91,7 +91,7 @@ Loongson provided the compiler suite for building kernel [here](http://www.loong
 However, Loongson only supports GCC 4.4.0, which is quite obsolete compared to
 the now-popular version 4.9.x or 5.x.x.
 
-Another good choice is Sourcery Codebench from Mentor Graphics.  The MIPS
+Another good choice is Sourcery Codebench from Mentor Graphics.The MIPS
 toolchain archive could be downloaded
 [here](sourcery.mentor.com/public/gnu_toolchain/mips-linux-gnu/mips-2015.05-18-mips-linux-gnu-i686-pc-linux-gnu.tar.bz2).
 
